@@ -109,6 +109,8 @@ h1.hero-title em{font-style:italic;color:var(--clay);font-weight:500;}
 .proj-link.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);}
 .proj-link.primary:hover{background:var(--star);border-color:var(--star);color:var(--bg);}
 .proj-link.disabled{opacity:0.4;pointer-events:none;}
+.proj-link.heroes{background:transparent;border-color:var(--gold);color:var(--gold);}
+.proj-link.heroes:hover{background:var(--gold);color:var(--bg);border-color:var(--gold);}
 
 @media (max-width:760px){
   .proj{grid-template-columns:1fr;}
@@ -214,7 +216,7 @@ footer{padding:24px 0 40px;text-align:center;font-family:var(--mono);font-size:1
     <div class="hero-eyebrow">full stack &amp; ai engineer</div>
     <div class="hero-name">Ayush Pahuja</div>
     <h1 class="hero-title">Systems that ship, learn, <em>and hold up.</em></h1>
-    <p class="hero-sub">Agentic AI, production web platforms, blockchain. Two years of shipping to real users.</p>
+    <p class="hero-sub">Agentic AI, production web platforms, blockchain. Latest build: <strong style="color:var(--star);">Swatch</strong> — a CSS design utility for front-end devs.</p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="#orion">View work ↓</a>
       <a class="btn btn-ghost" href="mailto:ayush.pahuja090@gmail.com">Say hello</a>
@@ -239,18 +241,6 @@ footer{padding:24px 0 40px;text-align:center;font-family:var(--mono);font-size:1
       <div class="proj featured">
         <div>
           <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
-          <div class="proj-title">Truth Lens</div>
-          <p class="proj-desc">A protocol to verify media origin — cryptographic and forensic proof of authenticity, built for a web where AI blurs what's real.</p>
-          <div class="proj-stack"><span class="chip">HTML</span><span class="chip">Hive AI</span><span class="chip">PHP</span></div>
-        </div>
-        <div class="proj-links">
-          <a class="proj-link primary" href="https://saddlebrown-bat-685673.hostingersite.com/" target="_blank" rel="noopener">Live ↗</a>
-        </div>
-      </div>
-
-      <div class="proj featured">
-        <div>
-          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
           <div class="proj-title">Swatch</div>
           <p class="proj-desc">Visual shadow, gradient, and palette builder for front-end devs — copy exact CSS instantly.</p>
           <div class="proj-stack"><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Tailwind</span></div>
@@ -258,6 +248,18 @@ footer{padding:24px 0 40px;text-align:center;font-family:var(--mono);font-size:1
         <div class="proj-links">
           <a class="proj-link primary" href="https://swatch-lilac.vercel.app/" target="_blank" rel="noopener">Live ↗</a>
           <a class="proj-link" href="https://github.com/Lowdata/swatch" target="_blank" rel="noopener">Source ↗</a>
+        </div>
+      </div>
+
+      <div class="proj featured">
+        <div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
+          <div class="proj-title">Truth Lens</div>
+          <p class="proj-desc">A protocol to verify media origin — cryptographic and forensic proof of authenticity, built for a web where AI blurs what's real.</p>
+          <div class="proj-stack"><span class="chip">HTML</span><span class="chip">Hive AI</span><span class="chip">PHP</span></div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link primary" href="https://saddlebrown-bat-685673.hostingersite.com/" target="_blank" rel="noopener">Live ↗</a>
         </div>
       </div>
 
@@ -361,7 +363,6 @@ footer{padding:24px 0 40px;text-align:center;font-family:var(--mono);font-size:1
           <a class="proj-link primary" href="https://natyashoes.com/" target="_blank" rel="noopener">Visit ↗</a>
         </div>
       </div>
-
     </div>
   </section>
 
@@ -531,7 +532,6 @@ footer{padding:24px 0 40px;text-align:center;font-family:var(--mono);font-size:1
     ctx.fillStyle = '#07080C';
     ctx.fillRect(0, 0, W, H);
 
-    // faint constellation links between nearby "link" stars
     ctx.strokeStyle = 'rgba(143,175,217,0.10)';
     ctx.lineWidth = 1;
     var linkStars = stars.filter(function(s){return s.link;});
