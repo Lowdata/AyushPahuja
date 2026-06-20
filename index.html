@@ -4,24 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ayush Pahuja — Full Stack AI Engineer</title>
-<meta name="description" content="Ayush Pahuja — Full Stack AI Engineer. Building agentic AI systems, scalable web platforms, and blockchain products.">
+<meta name="description" content="Ayush Pahuja — Full Stack AI Engineer. Agentic AI, scalable web platforms, blockchain.">
 <style>
-@font-face{font-family:'Fraunces';src:local('Georgia');}
 :root{
-  --bg:#0B0D10;
-  --bg-soft:#101317;
-  --surface:#15181C;
-  --surface-2:#1B1F24;
-  --line:#262B31;
-  --line-soft:#1E2227;
-  --ink:#F5F3EE;
-  --ink-dim:#A8AAA6;
-  --ink-faint:#6B6E6C;
-  --sage:#8FAFA4;
-  --sage-dim:#5E7A70;
-  --clay:#E8765C;
-  --clay-dim:#B8593F;
+  --bg:#07080C;
+  --bg-soft:#0B0D13;
+  --surface:#10131A;
+  --surface-2:#161A22;
+  --line:#22272F;
+  --line-soft:#1A1E25;
+  --ink:#F2F1ED;
+  --ink-dim:#9A9DA3;
+  --ink-faint:#5C6068;
+  --star:#8FAFD9;
   --gold:#D8B26A;
+  --clay:#E8765C;
+  --sage:#8FAFA4;
   --radius:14px;
   --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
   --serif:'Fraunces',Georgia,'Times New Roman',serif;
@@ -29,254 +27,182 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{
-  background:var(--bg);
-  color:var(--ink);
-  font-family:var(--sans);
-  line-height:1.6;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 a{color:inherit;}
-img{display:block;max-width:100%;}
 ::selection{background:var(--clay);color:var(--bg);}
-::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar{width:8px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:10px;}
-
-/* focus visibility */
-a:focus-visible,button:focus-visible{outline:2px solid var(--sage);outline-offset:3px;border-radius:4px;}
+a:focus-visible,button:focus-visible{outline:2px solid var(--star);outline-offset:3px;border-radius:4px;}
 
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
 }
 
-/* ===== background texture ===== */
-.grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+#sky{position:fixed;inset:0;z-index:0;background:var(--bg);}
 
-/* ===== status ledger (signature element) ===== */
-.ledger{
-  position:sticky;top:0;z-index:50;
-  background:rgba(11,13,16,0.92);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--line);
-  font-family:var(--mono);
-  font-size:11.5px;
-  letter-spacing:0.02em;
-}
-.ledger-inner{
-  max-width:1180px;margin:0 auto;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 28px;gap:16px;
-  overflow-x:auto;white-space:nowrap;
-}
-.ledger-left{display:flex;align-items:center;gap:18px;color:var(--ink-faint);}
-.ledger-item{display:flex;align-items:center;gap:7px;}
-.pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--sage);flex-shrink:0;animation:pulse 2.4s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(143,175,164,0.5);}50%{opacity:0.5;box-shadow:0 0 0 4px rgba(143,175,164,0);}}
-.ledger-status{color:var(--sage);}
-.ledger-nav{display:flex;gap:20px;}
-.ledger-nav a{color:var(--ink-faint);text-decoration:none;transition:color 0.2s;}
+/* ===== ledger ===== */
+.ledger{position:sticky;top:0;z-index:50;background:rgba(7,8,12,0.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;}
+.ledger-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:9px 20px;gap:12px;overflow-x:auto;white-space:nowrap;}
+.ledger-left{display:flex;align-items:center;gap:14px;color:var(--ink-faint);}
+.li{display:flex;align-items:center;gap:6px;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--star);flex-shrink:0;animation:tw 2.4s ease-in-out infinite;}
+@keyframes tw{0%,100%{opacity:1;}50%{opacity:0.35;}}
+.ledger-status{color:var(--star);}
+.ledger-nav{display:flex;gap:16px;}
+.ledger-nav a{color:var(--ink-faint);text-decoration:none;}
 .ledger-nav a:hover{color:var(--ink);}
+@media (max-width:700px){.ledger-nav{display:none;}}
 
-/* ===== layout shell ===== */
-.shell{max-width:1180px;margin:0 auto;padding:0 28px;position:relative;z-index:2;}
+.shell{max-width:1180px;margin:0 auto;padding:0 20px;position:relative;z-index:2;}
 section{position:relative;}
 
+/* ===== zone header (constellation pattern) ===== */
+.zone{padding:64px 0;border-top:1px solid var(--line-soft);}
+.zone:first-of-type{border-top:none;}
+.zone-head{margin-bottom:36px;}
+.zone-const{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--star);display:flex;align-items:center;gap:9px;}
+.zone-const::before{content:'';width:18px;height:1px;background:var(--star);}
+.zone-num{color:var(--ink-faint);margin-left:auto;}
+.zone-head .zc-row{display:flex;align-items:center;gap:9px;}
+h2.zone-title{font-family:var(--serif);font-weight:600;font-size:clamp(28px,5vw,46px);margin-top:8px;letter-spacing:-0.01em;}
+.zone-sub{margin-top:8px;color:var(--ink-faint);font-size:14px;max-width:480px;}
+
 /* ===== hero ===== */
-.hero{padding:120px 0 90px;}
-.hero-eyebrow{
-  font-family:var(--mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
-  color:var(--sage);margin-bottom:28px;display:flex;align-items:center;gap:10px;
-}
-.hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--sage);}
-h1.hero-title{
-  font-family:var(--serif);
-  font-weight:600;
-  font-size:clamp(42px,7vw,84px);
-  line-height:1.02;
-  letter-spacing:-0.01em;
-  max-width:880px;
-  color:var(--ink);
-}
-h1.hero-title em{
-  font-style:italic;color:var(--clay);font-weight:500;
-}
-.hero-sub{
-  margin-top:28px;max-width:600px;font-size:18px;color:var(--ink-dim);line-height:1.7;
-}
-.hero-actions{display:flex;gap:14px;margin-top:40px;flex-wrap:wrap;}
-.btn{
-  font-family:var(--sans);font-weight:600;font-size:14.5px;
-  padding:14px 26px;border-radius:999px;text-decoration:none;
-  display:inline-flex;align-items:center;gap:8px;transition:all 0.25s ease;border:1px solid transparent;
-}
+.hero{padding:80px 0 50px;}
+.hero-eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--star);margin-bottom:18px;display:flex;align-items:center;gap:9px;}
+.hero-eyebrow::before{content:'';width:18px;height:1px;background:var(--star);}
+.hero-name{font-family:var(--serif);font-weight:700;font-size:clamp(40px,8vw,80px);letter-spacing:-0.01em;line-height:1;margin-bottom:14px;background:linear-gradient(135deg,var(--ink) 40%,var(--star) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+h1.hero-title{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.5vw,44px);line-height:1.12;letter-spacing:-0.01em;max-width:760px;color:var(--ink-dim);}
+h1.hero-title em{font-style:italic;color:var(--clay);font-weight:500;}
+.hero-sub{margin-top:18px;max-width:480px;font-size:15.5px;color:var(--ink-dim);}
+.hero-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+.btn{font-family:var(--sans);font-weight:600;font-size:14px;padding:13px 22px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s;border:1px solid transparent;}
 .btn-primary{background:var(--ink);color:var(--bg);}
-.btn-primary:hover{background:var(--sage);transform:translateY(-1px);}
+.btn-primary:hover{background:var(--star);transform:translateY(-1px);}
 .btn-ghost{border-color:var(--line);color:var(--ink);}
-.btn-ghost:hover{border-color:var(--sage);color:var(--sage);transform:translateY(-1px);}
+.btn-ghost:hover{border-color:var(--star);color:var(--star);}
 
-.hero-meta{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:1px;margin-top:72px;
-  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
-  background:var(--line);
-}
-.hero-meta-item{background:var(--bg-soft);padding:22px 24px;}
-.hero-meta-num{font-family:var(--serif);font-size:30px;color:var(--ink);}
-.hero-meta-label{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:6px;}
+.principle-strip{display:flex;gap:8px;margin-top:34px;flex-wrap:wrap;}
+.principle{font-family:var(--mono);font-size:10.5px;letter-spacing:0.04em;color:var(--ink-faint);border:1px solid var(--line);padding:6px 12px;border-radius:999px;}
+.principle b{color:var(--sage);font-weight:600;}
 
-/* ===== section heads ===== */
-.section{padding:90px 0;border-top:1px solid var(--line-soft);}
-.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;margin-bottom:52px;flex-wrap:wrap;}
-.section-tag{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sage);}
-h2.section-title{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4vw,44px);margin-top:10px;letter-spacing:-0.01em;}
-.section-note{font-size:14px;color:var(--ink-faint);max-width:280px;text-align:right;}
-
-/* ===== about ===== */
-.about-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:64px;align-items:start;}
-.about-lead{font-family:var(--serif);font-size:24px;line-height:1.45;color:var(--ink);font-weight:500;}
-.about-lead em{color:var(--clay);font-style:italic;}
-.about-body{margin-top:24px;color:var(--ink-dim);font-size:15.5px;line-height:1.8;}
-.about-body p{margin-bottom:16px;}
-.about-side{display:flex;flex-direction:column;gap:14px;}
-.fact-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;}
-.fact-card .fk{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;}
-.fact-card .fv{font-size:15px;color:var(--ink);}
-.fact-card .fv strong{color:var(--sage);}
-
-/* ===== timeline (experience) ===== */
-.tl{position:relative;}
-.tl-item{display:grid;grid-template-columns:140px 1fr;gap:40px;padding:36px 0;border-top:1px solid var(--line-soft);}
-.tl-item:first-child{border-top:none;}
-.tl-period{font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);padding-top:4px;}
-.tl-role{font-family:var(--serif);font-size:23px;color:var(--ink);font-weight:600;}
-.tl-org{color:var(--sage);font-size:14.5px;margin-top:4px;font-weight:600;}
-.tl-list{margin-top:16px;color:var(--ink-dim);font-size:14.5px;line-height:1.8;}
-.tl-list li{margin-bottom:8px;padding-left:18px;position:relative;}
-.tl-list li::before{content:'';position:absolute;left:0;top:9px;width:6px;height:1px;background:var(--sage-dim);}
-.tl-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
-.chip{font-family:var(--mono);font-size:11px;color:var(--ink-dim);border:1px solid var(--line);padding:5px 11px;border-radius:999px;}
-
-/* ===== projects ===== */
-.proj-grid{display:flex;flex-direction:column;gap:18px;}
-.proj{
-  border:1px solid var(--line);border-radius:var(--radius);
-  background:var(--surface);
-  padding:30px 32px;
-  display:grid;grid-template-columns:1fr 280px;gap:32px;
-  transition:border-color 0.25s ease, transform 0.25s ease;
-}
-.proj:hover{border-color:var(--sage-dim);transform:translateY(-2px);}
-.proj.featured{
-  background:linear-gradient(155deg,#16201D 0%,var(--surface) 60%);
-  border-color:var(--sage-dim);
-}
-.proj-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.status-pill{
-  font-family:var(--mono);font-size:10px;letter-spacing:0.07em;text-transform:uppercase;
-  padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;
-}
-.status-pill.live{background:rgba(143,175,164,0.14);color:var(--sage);}
-.status-pill.live .pulse-dot{background:var(--sage);}
+/* ===== projects (Orion) — moved up, primary zone ===== */
+.proj-grid{display:flex;flex-direction:column;gap:12px;}
+.proj{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:22px 24px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;transition:border-color .2s,transform .2s;}
+.proj:hover{border-color:var(--star);transform:translateY(-1px);}
+.proj.featured{background:linear-gradient(155deg,#121A22 0%,var(--surface) 65%);border-color:#2C3B47;}
+.proj-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.status-pill{font-family:var(--mono);font-size:9.5px;letter-spacing:0.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:5px;}
+.status-pill.live{background:rgba(143,175,217,0.14);color:var(--star);}
+.status-pill.live .dot{background:var(--star);}
 .status-pill.progress{background:rgba(216,178,106,0.14);color:var(--gold);}
-.status-pill.progress .pulse-dot{background:var(--gold);animation:none;}
-.status-pill.archived{background:rgba(168,170,166,0.1);color:var(--ink-faint);}
-.proj-title{font-family:var(--serif);font-size:24px;color:var(--ink);font-weight:600;margin-top:14px;}
-.proj-desc{margin-top:10px;color:var(--ink-dim);font-size:14.5px;line-height:1.7;max-width:520px;}
-.proj-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
-.proj-links{display:flex;flex-direction:column;gap:10px;justify-content:center;}
-.proj-link{
-  font-family:var(--sans);font-weight:600;font-size:13.5px;
-  padding:13px 18px;border-radius:10px;text-decoration:none;
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  border:1px solid var(--line);color:var(--ink);transition:all 0.2s ease;
-}
-.proj-link:hover{border-color:var(--sage);color:var(--sage);}
+.status-pill.progress .dot{background:var(--gold);animation:none;}
+.status-pill.archived{background:rgba(154,157,163,0.1);color:var(--ink-faint);}
+.proj-title{font-family:var(--serif);font-size:20px;font-weight:600;}
+.proj-desc{margin-top:5px;color:var(--ink-dim);font-size:13px;line-height:1.55;max-width:480px;}
+.proj-stack{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+.chip{font-family:var(--mono);font-size:10px;color:var(--ink-dim);border:1px solid var(--line);padding:4px 9px;border-radius:999px;white-space:nowrap;}
+.proj-links{display:flex;flex-direction:column;gap:8px;}
+.proj-link{font-family:var(--sans);font-weight:600;font-size:12.5px;padding:10px 16px;border-radius:9px;text-decoration:none;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);transition:all .2s;white-space:nowrap;}
+.proj-link:hover{border-color:var(--star);color:var(--star);}
 .proj-link.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);}
-.proj-link.primary:hover{background:var(--sage);border-color:var(--sage);color:var(--bg);}
-.proj-link.disabled{opacity:0.45;pointer-events:none;}
-.proj-link .arrow{transition:transform 0.2s ease;}
-.proj-link:hover .arrow{transform:translate(3px,-3px);}
+.proj-link.primary:hover{background:var(--star);border-color:var(--star);color:var(--bg);}
+.proj-link.disabled{opacity:0.4;pointer-events:none;}
 
-@media (max-width: 760px){
+@media (max-width:760px){
   .proj{grid-template-columns:1fr;}
   .proj-links{flex-direction:row;flex-wrap:wrap;}
+  .proj-link{flex:1;min-width:130px;}
 }
 
-/* ===== skills ===== */
+.proj-divider{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin:22px 0 4px;display:flex;align-items:center;gap:10px;}
+.proj-divider::after{content:'';flex:1;height:1px;background:var(--line-soft);}
+
+/* ===== about (Cassiopeia) ===== */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start;}
+.about-lead{font-family:var(--serif);font-size:19px;line-height:1.4;font-weight:500;}
+.about-lead em{color:var(--clay);font-style:italic;}
+.fact-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;}
+.fact-card .fk{font-family:var(--mono);font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;}
+.fact-card .fv{font-size:13.5px;color:var(--ink);line-height:1.55;}
+.fact-card .fv b{color:var(--star);}
+@media (max-width:760px){.about-grid{grid-template-columns:1fr;}}
+
+/* ===== currently pursuing (Polaris) ===== */
+.pursuit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+.pursuit{background:var(--bg-soft);padding:22px 20px;}
+.pursuit .pi{font-size:22px;margin-bottom:10px;display:block;}
+.pursuit h4{font-family:var(--serif);font-size:15.5px;margin-bottom:6px;}
+.pursuit p{font-size:12.5px;color:var(--ink-faint);line-height:1.5;}
+@media (max-width:760px){.pursuit-grid{grid-template-columns:1fr;}}
+
+.horizon{margin-top:28px;border:1px dashed var(--line);border-radius:var(--radius);padding:20px 22px;}
+.horizon .hk{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.horizon-list{display:flex;flex-direction:column;gap:9px;}
+.horizon-item{display:flex;gap:10px;font-size:13.5px;color:var(--ink-dim);align-items:baseline;}
+.horizon-item .hmark{color:var(--gold);font-family:var(--mono);font-size:12px;flex-shrink:0;}
+
+/* ===== experience (Draco) ===== */
+.tl-item{display:grid;grid-template-columns:110px 1fr;gap:24px;padding:24px 0;border-top:1px solid var(--line-soft);}
+.tl-item:first-child{border-top:none;}
+.tl-period{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);padding-top:3px;}
+.tl-role{font-family:var(--serif);font-size:19px;font-weight:600;}
+.tl-org{color:var(--star);font-size:13px;margin-top:3px;font-weight:600;}
+.tl-list{margin-top:10px;color:var(--ink-dim);font-size:13px;line-height:1.65;}
+.tl-list li{margin-bottom:5px;padding-left:14px;position:relative;}
+.tl-list li::before{content:'';position:absolute;left:0;top:8px;width:5px;height:1px;background:var(--star);opacity:0.6;}
+.tl-stack{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+@media (max-width:600px){.tl-item{grid-template-columns:1fr;gap:6px;}}
+
+/* ===== skills (Lyra) ===== */
 .skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
-.skill-block{background:var(--bg-soft);padding:26px 28px;}
-.skill-block h3{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--sage);margin-bottom:16px;}
-.skill-tags{display:flex;flex-wrap:wrap;gap:8px;}
-.skill-tags span{font-size:13px;color:var(--ink-dim);}
-.skill-tags span:not(:last-child)::after{content:'·';color:var(--ink-faint);margin-left:8px;}
+.skill-block{background:var(--bg-soft);padding:18px 20px;}
+.skill-block h3{font-family:var(--mono);font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--star);margin-bottom:11px;}
+.skill-tags{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--ink-dim);}
+.skill-tags span:not(:last-child)::after{content:'·';color:var(--ink-faint);margin-left:6px;}
+@media (max-width:760px){.skill-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:480px){.skill-grid{grid-template-columns:1fr;}}
 
-@media (max-width:900px){.skill-grid{grid-template-columns:1fr;}}
-
-/* ===== hobbies ===== */
+/* ===== hobbies (Lyra continued / off-duty) ===== */
 .hobby-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
-.hobby{background:var(--bg-soft);padding:28px 24px;}
-.hobby .hi{font-size:26px;margin-bottom:14px;display:block;}
-.hobby h4{font-family:var(--serif);font-size:17px;color:var(--ink);margin-bottom:8px;}
-.hobby p{font-size:13px;color:var(--ink-faint);line-height:1.6;}
-@media (max-width:900px){.hobby-row{grid-template-columns:repeat(2,1fr);}}
+.hobby{background:var(--bg-soft);padding:18px 16px;}
+.hobby .hi{font-size:20px;margin-bottom:8px;display:block;}
+.hobby h4{font-family:var(--serif);font-size:14.5px;margin-bottom:4px;}
+.hobby p{font-size:11.5px;color:var(--ink-faint);line-height:1.5;}
+@media (max-width:760px){.hobby-row{grid-template-columns:1fr 1fr;}}
 
-/* ===== contact ===== */
-.contact-wrap{
-  border:1px solid var(--line);border-radius:24px;
-  padding:64px 56px;
-  background:radial-gradient(circle at 20% 20%, rgba(143,175,164,0.08), transparent 60%);
-  text-align:left;
-}
-.contact-title{font-family:var(--serif);font-size:clamp(32px,5vw,54px);font-weight:600;max-width:620px;line-height:1.1;}
+/* ===== contact (Pegasus) ===== */
+.contact-wrap{border:1px solid var(--line);border-radius:20px;padding:40px 28px;background:radial-gradient(circle at 20% 20%, rgba(143,175,217,0.08), transparent 60%);}
+.contact-title{font-family:var(--serif);font-size:clamp(26px,5vw,42px);font-weight:600;max-width:560px;line-height:1.1;}
 .contact-title em{color:var(--clay);font-style:italic;}
-.contact-sub{margin-top:18px;color:var(--ink-dim);font-size:16px;max-width:460px;}
-.contact-rows{margin-top:40px;display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line);}
-.contact-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:20px 4px;border-bottom:1px solid var(--line);
-  text-decoration:none;color:var(--ink);transition:padding-left 0.2s ease;
-}
-.contact-row:hover{padding-left:12px;color:var(--sage);}
-.contact-row .ck{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.06em;text-transform:uppercase;}
-.contact-row .cv{font-size:16px;font-weight:600;}
-.contact-row .arrow{color:var(--ink-faint);transition:transform 0.2s ease;}
-.contact-row:hover .arrow{transform:translate(4px,-4px);color:var(--sage);}
+.contact-sub{margin-top:12px;color:var(--ink-dim);font-size:14px;max-width:420px;}
+.contact-rows{margin-top:24px;border-top:1px solid var(--line);}
+.contact-row{display:flex;justify-content:space-between;align-items:center;padding:16px 4px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);transition:padding-left .2s;}
+.contact-row:hover{padding-left:10px;color:var(--star);}
+.contact-row .ck{font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:0.05em;text-transform:uppercase;}
+.contact-row .cv{font-size:14.5px;font-weight:600;}
 
-footer{padding:36px 0 60px;text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);}
-
-@media (max-width:860px){
-  .hero{padding:90px 0 60px;}
-  .hero-meta{grid-template-columns:repeat(2,1fr);}
-  .about-grid{grid-template-columns:1fr;gap:36px;}
-  .tl-item{grid-template-columns:1fr;gap:10px;}
-  .section{padding:64px 0;}
-  .contact-wrap{padding:40px 26px;}
-  .ledger-nav{display:none;}
-}
-@media (max-width:500px){
-  .shell{padding:0 18px;}
-  h1.hero-title{font-size:38px;}
-}
+footer{padding:24px 0 40px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-faint);}
 </style>
 </head>
 <body>
-<div class="grain"></div>
+
+<canvas id="sky"></canvas>
 
 <div class="ledger">
   <div class="ledger-inner">
     <div class="ledger-left">
-      <span class="ledger-item"><span class="pulse-dot"></span><span class="ledger-status">available for work</span></span>
-      <span class="ledger-item">delhi, in</span>
-      <span class="ledger-item">latest build: swatch</span>
+      <span class="li"><span class="dot"></span><span class="ledger-status">open to work</span></span>
+      <span class="li">delhi</span>
     </div>
     <div class="ledger-nav">
-      <a href="#about">about</a>
-      <a href="#experience">work</a>
-      <a href="#projects">projects</a>
-      <a href="#skills">skills</a>
-      <a href="#contact">contact</a>
+      <a href="#orion">work</a>
+      <a href="#cassiopeia">about</a>
+      <a href="#polaris">pursuing</a>
+      <a href="#draco">history</a>
+      <a href="#lyra">skills</a>
+      <a href="#pegasus">contact</a>
     </div>
   </div>
 </div>
@@ -286,373 +212,367 @@ footer{padding:36px 0 60px;text-align:center;font-family:var(--mono);font-size:1
   <!-- HERO -->
   <section class="hero">
     <div class="hero-eyebrow">full stack &amp; ai engineer</div>
-    <h1 class="hero-title">I build systems that learn, ship, <em>and don't fall over.</em></h1>
-    <p class="hero-sub">Ayush Pahuja — two years deep in agentic AI workflows, production-grade web platforms, and blockchain infrastructure. I take products from a blank repo to thousands of real users.</p>
+    <div class="hero-name">Ayush Pahuja</div>
+    <h1 class="hero-title">Systems that ship, learn, <em>and hold up.</em></h1>
+    <p class="hero-sub">Agentic AI, production web platforms, blockchain. Two years of shipping to real users.</p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="#projects">See the work ↓</a>
-      <a class="btn btn-ghost" href="mailto:ayush.pahuja090@gmail.com">Get in touch</a>
+      <a class="btn btn-primary" href="#orion">View work ↓</a>
+      <a class="btn btn-ghost" href="mailto:ayush.pahuja090@gmail.com">Say hello</a>
     </div>
-
-    <div class="hero-meta">
-      <div class="hero-meta-item">
-        <div class="hero-meta-num">2+</div>
-        <div class="hero-meta-label">Years in production</div>
-      </div>
-      <div class="hero-meta-item">
-        <div class="hero-meta-num">50K+</div>
-        <div class="hero-meta-label">Users served</div>
-      </div>
-      <div class="hero-meta-item">
-        <div class="hero-meta-num">7</div>
-        <div class="hero-meta-label">Shipped products</div>
-      </div>
-      <div class="hero-meta-item">
-        <div class="hero-meta-num">0</div>
-        <div class="hero-meta-label">Security breaches</div>
-      </div>
+    <div class="principle-strip">
+      <span class="principle"><b>Ownership</b> — I debug first, blame never</span>
+      <span class="principle"><b>Speed + Quality</b> — speed opens doors, quality keeps them open</span>
+      <span class="principle"><b>Client Focus</b> — every decision serves the user</span>
     </div>
   </section>
 
-  <!-- ABOUT -->
-  <section class="section" id="about">
-    <div class="section-head">
-      <div>
-        <div class="section-tag">01 / about</div>
-        <h2 class="section-title">From circuits to agents</h2>
-      </div>
-      <div class="section-note">B.Tech ECE, NSUT East Campus, Delhi — then a hard pivot into AI &amp; full-stack engineering.</div>
-    </div>
-
-    <div class="about-grid">
-      <div>
-        <p class="about-lead">I build AI-powered products that don't just work — they <em>perform</em> under real users, real load, and real deadlines.</p>
-        <div class="about-body">
-          <p>I own features end-to-end: wiring Claude and Gemini into LangGraph multi-agent workflows, training YOLOv8 models for computer vision, and shipping zero-downtime deployments on AWS and Vercel.</p>
-          <p>My background started in electronics and signals at NSUT — by the time I graduated, I'd already moved into AI pipelines and Web3, and never looked back.</p>
-        </div>
-      </div>
-      <div class="about-side">
-        <div class="fact-card">
-          <div class="fk">Currently</div>
-          <div class="fv">Open for <strong>freelance, contract, and full-time</strong> roles in AI engineering and full-stack development.</div>
-        </div>
-        <div class="fact-card">
-          <div class="fk">Philosophy</div>
-          <div class="fv">"Write code that works today and makes sense tomorrow. Test like you expect it to break. Deploy like you're confident it won't."</div>
-        </div>
-        <div class="fact-card">
-          <div class="fk">Outside of work</div>
-          <div class="fv">Lifting <strong>5–6 days/week</strong>, producing lo-fi beats, and reading about distributed systems for fun.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- EXPERIENCE -->
-  <section class="section" id="experience">
-    <div class="section-head">
-      <div>
-        <div class="section-tag">02 / experience</div>
-        <h2 class="section-title">Where I've worked</h2>
-      </div>
-      <div class="section-note">Remote roles across AI infrastructure, Web3, and full-stack product engineering.</div>
-    </div>
-
-    <div class="tl">
-      <div class="tl-item">
-        <div class="tl-period">Jun 2024 —<br>Sep 2025</div>
-        <div>
-          <div class="tl-role">Full Stack &amp; AI Engineer</div>
-          <div class="tl-org">Vegavid Technologies · Remote</div>
-          <ul class="tl-list">
-            <li>Engineered AI-driven apps integrating Claude and Gemini APIs; implemented LangGraph for multi-agent orchestration.</li>
-            <li>Trained and fine-tuned YOLOv8 models; used OpenCV for image processing and visualisation.</li>
-            <li>Architected the Iberia Gold token sale platform — secure ERC20 purchases via Stripe and USDT on Polygon.</li>
-            <li>Built an automated autosweep service using Node.js crons to aggregate treasury funds.</li>
-            <li>Migrated infrastructure to Supabase (Edge Functions, Auth) with Tailwind CSS on the frontend.</li>
-            <li>Containerised AI services with Docker; set up GitHub Actions for zero-downtime deploys on Vercel and EC2.</li>
-            <li>Scaled systems to 50K+ users, monitored with Prometheus and Grafana.</li>
-          </ul>
-          <div class="tl-stack">
-            <span class="chip">Claude API</span><span class="chip">LangGraph</span><span class="chip">YOLOv8</span>
-            <span class="chip">Supabase</span><span class="chip">Docker</span><span class="chip">AWS EC2</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-period">Jan 2023 —<br>Jun 2024</div>
-        <div>
-          <div class="tl-role">Full Stack Developer</div>
-          <div class="tl-org">OneRare · Remote</div>
-          <ul class="tl-list">
-            <li>Built dApps with React.js and Web3.js, with smart contracts on Ethereum and Polygon.</li>
-            <li>Managed backend APIs on AWS EC2 with CloudWatch — 99.9% uptime through NFT sale events.</li>
-            <li>Automated containerised workflows with Docker Compose and GitHub Actions.</li>
-            <li>Implemented JWT and OAuth 2.0 authentication across distributed services.</li>
-          </ul>
-          <div class="tl-stack">
-            <span class="chip">React.js</span><span class="chip">Web3.js</span><span class="chip">Ethereum</span>
-            <span class="chip">AWS EC2</span><span class="chip">OAuth 2.0</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-period">E-commerce</div>
-        <div>
-          <div class="tl-role">Shopify &amp; WordPress</div>
-          <div class="tl-org">Independent client work</div>
-          <ul class="tl-list">
-            <li>Custom Shopify themes, app integrations, and conversion-focused storefronts — including headless builds with Next.js.</li>
-            <li>WordPress plugin and theme development, WooCommerce stores tuned for speed, security, and scale.</li>
-          </ul>
-          <div class="tl-stack">
-            <span class="chip">Shopify Liquid</span><span class="chip">WooCommerce</span><span class="chip">Next.js</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PROJECTS -->
-  <section class="section" id="projects">
-    <div class="section-head">
-      <div>
-        <div class="section-tag">03 / projects</div>
-        <h2 class="section-title">Things I've shipped</h2>
-      </div>
-      <div class="section-note">Every link below is live — click through to the real product or the source.</div>
+  <!-- PROJECTS — ORION -->
+  <section class="zone" id="orion">
+    <div class="zone-head">
+      <div class="zc-row"><div class="zone-const">Orion</div><div class="zone-num">the hunter</div></div>
+      <h2 class="zone-title">Work, built and live</h2>
+      <p class="zone-sub">Every link below goes somewhere real. Click through.</p>
     </div>
 
     <div class="proj-grid">
 
-      <!-- Swatch -->
       <div class="proj featured">
         <div>
-          <div class="proj-head">
-            <span class="status-pill live"><span class="pulse-dot"></span>live</span>
-          </div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
+          <div class="proj-title">Truth Lens</div>
+          <p class="proj-desc">A protocol to verify media origin — cryptographic and forensic proof of authenticity, built for a web where AI blurs what's real.</p>
+          <div class="proj-stack"><span class="chip">HTML</span><span class="chip">Hive AI</span><span class="chip">PHP</span></div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link primary" href="https://saddlebrown-bat-685673.hostingersite.com/" target="_blank" rel="noopener">Live ↗</a>
+        </div>
+      </div>
+
+      <div class="proj featured">
+        <div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
           <div class="proj-title">Swatch</div>
-          <p class="proj-desc">A premium design utility for front-end developers. Tune shadows, gradients, colour palettes, and full brand themes visually — then copy the exact CSS, Tailwind, or variable output.</p>
-          <div class="proj-stack">
-            <span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Tailwind CSS</span><span class="chip">Vercel</span>
-          </div>
+          <p class="proj-desc">Visual shadow, gradient, and palette builder for front-end devs — copy exact CSS instantly.</p>
+          <div class="proj-stack"><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Tailwind</span></div>
         </div>
         <div class="proj-links">
-          <a class="proj-link primary" href="https://swatch-lilac.vercel.app/" target="_blank" rel="noopener">Live demo <span class="arrow">↗</span></a>
-          <a class="proj-link" href="https://github.com/Lowdata/swatch" target="_blank" rel="noopener">View source <span class="arrow">↗</span></a>
+          <a class="proj-link primary" href="https://swatch-lilac.vercel.app/" target="_blank" rel="noopener">Live ↗</a>
+          <a class="proj-link" href="https://github.com/Lowdata/swatch" target="_blank" rel="noopener">Source ↗</a>
         </div>
       </div>
 
-      <!-- Nukriti+ -->
       <div class="proj featured">
         <div>
-          <div class="proj-head">
-            <span class="status-pill live"><span class="pulse-dot"></span>live</span>
-          </div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
           <div class="proj-title">Nukriti+</div>
-          <p class="proj-desc">A private "Netflix for family memories" — upload and stream home videos with a proper media-library experience, built for one family's archive rather than the public internet.</p>
-          <div class="proj-stack">
-            <span class="chip">Next.js</span><span class="chip">Firebase</span><span class="chip">Cloudflare R2</span>
-          </div>
+          <p class="proj-desc">A private streaming library for family videos and memories — built like Netflix, just for us.</p>
+          <div class="proj-stack"><span class="chip">Next.js</span><span class="chip">Firebase</span><span class="chip">Cloudflare R2</span></div>
         </div>
         <div class="proj-links">
-          <a class="proj-link primary" href="https://nukritiplusapp.vercel.app/" target="_blank" rel="noopener">Live demo <span class="arrow">↗</span></a>
-          <a class="proj-link" href="https://github.com/Lowdata/nukritiplusapp" target="_blank" rel="noopener">View source <span class="arrow">↗</span></a>
+          <a class="proj-link primary" href="https://nukritiplusapp.vercel.app/" target="_blank" rel="noopener">Live ↗</a>
+          <a class="proj-link" href="https://github.com/Lowdata/nukritiplusapp" target="_blank" rel="noopener">Source ↗</a>
         </div>
       </div>
 
-      <!-- CertiFit -->
       <div class="proj">
         <div>
-          <div class="proj-head">
-            <span class="status-pill progress">in progress</span>
-          </div>
+          <div class="proj-head"><span class="status-pill progress">in progress</span></div>
           <div class="proj-title">CertiFit</div>
-          <p class="proj-desc">An AI-based recruiting platform that scores candidates against a specific job profile using Gemini AI and an internal weighted-scoring formula — built to cut early-stage screening time for recruiters.</p>
-          <div class="proj-stack">
-            <span class="chip">Next.js</span><span class="chip">FastAPI</span><span class="chip">Gemini AI</span>
-          </div>
+          <p class="proj-desc">AI recruiter platform — scores candidates against a job profile using Gemini AI and a custom weighted formula.</p>
+          <div class="proj-stack"><span class="chip">Next.js</span><span class="chip">FastAPI</span><span class="chip">Gemini AI</span></div>
         </div>
         <div class="proj-links">
-          <a class="proj-link" href="https://github.com/Lowdata/CertiFit" target="_blank" rel="noopener">View source <span class="arrow">↗</span></a>
-          <span class="proj-link disabled">Live demo — coming soon</span>
+          <a class="proj-link" href="https://github.com/Lowdata/CertiFit" target="_blank" rel="noopener">Source ↗</a>
+          <span class="proj-link disabled">Live — soon</span>
         </div>
       </div>
 
-      <!-- Iberia Gold -->
       <div class="proj">
         <div>
-          <div class="proj-head">
-            <span class="status-pill live"><span class="pulse-dot"></span>live</span>
-          </div>
-          <div class="proj-title">Iberia Gold Token Platform</div>
-          <p class="proj-desc">A secure ERC20 token sale platform supporting purchases via Stripe and USDT on Polygon, with PostgreSQL-backed transactional integrity and an automated autosweep service for treasury aggregation. Zero security breaches in production.</p>
-          <div class="proj-stack">
-            <span class="chip">React</span><span class="chip">Node.js</span><span class="chip">PostgreSQL</span><span class="chip">Stripe</span><span class="chip">Polygon</span>
-          </div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
+          <div class="proj-title">Iberia Gold</div>
+          <p class="proj-desc">ERC20 token platform — Stripe + USDT on Polygon, zero security breaches in production.</p>
+          <div class="proj-stack"><span class="chip">React</span><span class="chip">Node.js</span><span class="chip">Polygon</span></div>
         </div>
         <div class="proj-links">
-          <a class="proj-link primary" href="https://www.iberiagold.com/" target="_blank" rel="noopener">Main site <span class="arrow">↗</span></a>
-          <a class="proj-link" href="https://igst.iberia.secdex.net/Iberia" target="_blank" rel="noopener">Token platform <span class="arrow">↗</span></a>
+          <a class="proj-link primary" href="https://www.iberiagold.com/" target="_blank" rel="noopener">Main site ↗</a>
+          <a class="proj-link" href="https://igst.iberia.secdex.net/Iberia" target="_blank" rel="noopener">Token app ↗</a>
         </div>
       </div>
 
-      <!-- The Place To Be -->
       <div class="proj">
         <div>
-          <div class="proj-head">
-            <span class="status-pill live"><span class="pulse-dot"></span>live</span>
-          </div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
           <div class="proj-title">The Place To Be</div>
-          <p class="proj-desc">A booking and events site for farmhouse parties — built fast and lean, with Firebase handling data and Hostinger for hosting.</p>
-          <div class="proj-stack">
-            <span class="chip">HTML</span><span class="chip">Firebase</span><span class="chip">Hostinger</span>
-          </div>
+          <p class="proj-desc">Booking site for farmhouse parties and events.</p>
+          <div class="proj-stack"><span class="chip">HTML</span><span class="chip">Firebase</span><span class="chip">Hostinger</span></div>
         </div>
         <div class="proj-links">
-          <a class="proj-link primary" href="https://theplacetobe.social/" target="_blank" rel="noopener">Visit site <span class="arrow">↗</span></a>
-          <span class="proj-link disabled">Source — private</span>
+          <a class="proj-link primary" href="https://theplacetobe.social/" target="_blank" rel="noopener">Visit ↗</a>
         </div>
       </div>
 
-      <!-- WhatsApp Analytics -->
+      <div class="proj-divider">Shopify &amp; WordPress builds</div>
+
       <div class="proj">
         <div>
-          <div class="proj-head">
-            <span class="status-pill archived">archived</span>
-          </div>
-          <div class="proj-title">WhatsApp Chat Analytics</div>
-          <p class="proj-desc">Processes 1M+ messages into real-time analytics and visualisations, with query optimisation that cut database response time by 60%.</p>
-          <div class="proj-stack">
-            <span class="chip">React</span><span class="chip">Express</span><span class="chip">MongoDB</span><span class="chip">Chart.js</span>
-          </div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
+          <div class="proj-title">Bari Ramotor</div>
+          <p class="proj-desc">Custom storefront build, tuned for conversion.</p>
+          <div class="proj-stack"><span class="chip">Shopify</span></div>
         </div>
         <div class="proj-links">
-          <a class="proj-link" href="https://github.com/Lowdata" target="_blank" rel="noopener">View on GitHub <span class="arrow">↗</span></a>
+          <a class="proj-link primary" href="https://bariramotor.com/" target="_blank" rel="noopener">Visit ↗</a>
         </div>
       </div>
 
-      <!-- Crypto Wallet -->
       <div class="proj">
         <div>
-          <div class="proj-head">
-            <span class="status-pill archived">archived</span>
-          </div>
-          <div class="proj-title">Crypto Wallet App</div>
-          <p class="proj-desc">A cross-platform mobile wallet for Ethereum and Polygon with real-time prices, push notifications, and live WebSocket pricing — reached 5K+ monthly users.</p>
-          <div class="proj-stack">
-            <span class="chip">React Native</span><span class="chip">Firebase</span><span class="chip">Web3.js</span>
-          </div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
+          <div class="proj-title">Nayan Sukh Exclusive</div>
+          <p class="proj-desc">E-commerce storefront with custom theming.</p>
+          <div class="proj-stack"><span class="chip">Shopify</span></div>
         </div>
         <div class="proj-links">
-          <a class="proj-link" href="https://github.com/Lowdata" target="_blank" rel="noopener">View on GitHub <span class="arrow">↗</span></a>
+          <a class="proj-link primary" href="https://nayansukhexclusive.com/" target="_blank" rel="noopener">Visit ↗</a>
         </div>
       </div>
 
-      <!-- Catoff Protocol -->
       <div class="proj">
         <div>
-          <div class="proj-head">
-            <span class="status-pill archived">open source</span>
-          </div>
-          <div class="proj-title">Catoff Protocol</div>
-          <p class="proj-desc">Bridges Web2 and Web3 — connecting YouTube APIs to on-chain smart contracts with decentralised verification and analytics dashboards. 10+ merged PRs.</p>
-          <div class="proj-stack">
-            <span class="chip">Node.js</span><span class="chip">React</span><span class="chip">D3.js</span><span class="chip">Smart Contracts</span>
-          </div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
+          <div class="proj-title">Takeover Music Academy</div>
+          <p class="proj-desc">Site and booking flow for a music academy.</p>
+          <div class="proj-stack"><span class="chip">WordPress</span></div>
         </div>
         <div class="proj-links">
-          <a class="proj-link" href="https://github.com/Lowdata" target="_blank" rel="noopener">View on GitHub <span class="arrow">↗</span></a>
+          <a class="proj-link primary" href="https://takeovermusicacademy.com/" target="_blank" rel="noopener">Visit ↗</a>
+        </div>
+      </div>
+
+      <div class="proj">
+        <div>
+          <div class="proj-head"><span class="status-pill live"><span class="dot"></span>live</span></div>
+          <div class="proj-title">Natya Shoes</div>
+          <p class="proj-desc">Product catalogue and storefront for a footwear brand.</p>
+          <div class="proj-stack"><span class="chip">Shopify</span></div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link primary" href="https://natyashoes.com/" target="_blank" rel="noopener">Visit ↗</a>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- SKILLS -->
-  <section class="section" id="skills">
-    <div class="section-head">
+  <!-- ABOUT — CASSIOPEIA -->
+  <section class="zone" id="cassiopeia">
+    <div class="zone-head">
+      <div class="zc-row"><div class="zone-const">Cassiopeia</div><div class="zone-num">the throne</div></div>
+      <h2 class="zone-title">Who's behind this</h2>
+      <p class="zone-sub">A quick read, not a resume.</p>
+    </div>
+
+    <div class="about-grid">
       <div>
-        <div class="section-tag">04 / skills</div>
-        <h2 class="section-title">The toolkit</h2>
+        <p class="about-lead">AI products that <em>perform</em> under real load — not just demo well.</p>
       </div>
-      <div class="section-note">If it involves AI, the web, or blockchain — it's in here somewhere.</div>
+      <div>
+        <div class="fact-card"><div class="fk">Background</div><div class="fv">B.Tech ECE, NSUT Delhi — circuits first, <b>AI &amp; Web3</b> next.</div></div>
+        <div class="fact-card"><div class="fk">Mindset</div><div class="fv"><b>Ownership</b> over blame. <b>Communication</b> over surprises. <b>Continuous learning</b>, every project.</div></div>
+        <div class="fact-card"><div class="fk">Currently</div><div class="fv">Open for freelance, contract, and full-time roles.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURRENTLY PURSUING — POLARIS -->
+  <section class="zone" id="polaris">
+    <div class="zone-head">
+      <div class="zc-row"><div class="zone-const">Polaris</div><div class="zone-num">the guide star</div></div>
+      <h2 class="zone-title">What I'm chasing now</h2>
+      <p class="zone-sub">Fixed points I'm steering toward this year.</p>
+    </div>
+
+    <div class="pursuit-grid">
+      <div class="pursuit"><span class="pi">🤖</span><h4>Deeper into AI</h4><p>Agentic systems, multi-model orchestration, applied LLM engineering.</p></div>
+      <div class="pursuit"><span class="pi">🛡️</span><h4>Cybersecurity</h4><p>Studying for certification — securing what I build, not just shipping it.</p></div>
+      <div class="pursuit"><span class="pi">🤝</span><h4>Better collaborators</h4><p>Looking to work alongside people who share the same standards.</p></div>
+    </div>
+
+    <div class="horizon">
+      <div class="hk">On the horizon</div>
+      <div class="horizon-list">
+        <div class="horizon-item"><span class="hmark">→</span>Run a 40km marathon</div>
+        <div class="horizon-item"><span class="hmark">→</span>Win a hackathon</div>
+        <div class="horizon-item"><span class="hmark">→</span>Get cybersecurity certified</div>
+        <div class="horizon-item"><span class="hmark">→</span>Build with people who care as much as I do</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE — DRACO -->
+  <section class="zone" id="draco">
+    <div class="zone-head">
+      <div class="zc-row"><div class="zone-const">Draco</div><div class="zone-num">the dragon</div></div>
+      <h2 class="zone-title">Where I've worked</h2>
+      <p class="zone-sub">The long trail behind the current work.</p>
+    </div>
+
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-period">Jun 2024 –<br>Sep 2025</div>
+        <div>
+          <div class="tl-role">Full Stack &amp; AI Engineer</div>
+          <div class="tl-org">Vegavid Technologies</div>
+          <ul class="tl-list">
+            <li>Claude + Gemini APIs, LangGraph multi-agent orchestration.</li>
+            <li>YOLOv8 fine-tuning, OpenCV pipelines.</li>
+            <li>Iberia Gold token platform — Stripe + USDT on Polygon.</li>
+            <li>Docker + GitHub Actions → zero-downtime deploys, 50K+ users.</li>
+          </ul>
+          <div class="tl-stack"><span class="chip">LangGraph</span><span class="chip">YOLOv8</span><span class="chip">Supabase</span><span class="chip">Docker</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-period">Jan 2023 –<br>Jun 2024</div>
+        <div>
+          <div class="tl-role">Full Stack Developer</div>
+          <div class="tl-org">OneRare</div>
+          <ul class="tl-list">
+            <li>dApps on Ethereum &amp; Polygon with React + Web3.js.</li>
+            <li>99.9% uptime through NFT sale events.</li>
+            <li>JWT + OAuth 2.0 across distributed services.</li>
+          </ul>
+          <div class="tl-stack"><span class="chip">Web3.js</span><span class="chip">AWS EC2</span><span class="chip">OAuth 2.0</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS — LYRA -->
+  <section class="zone" id="lyra">
+    <div class="zone-head">
+      <div class="zc-row"><div class="zone-const">Lyra</div><div class="zone-num">the instrument</div></div>
+      <h2 class="zone-title">The toolkit</h2>
     </div>
 
     <div class="skill-grid">
-      <div class="skill-block">
-        <h3>AI &amp; Orchestration</h3>
-        <div class="skill-tags"><span>LangChain</span><span>LangGraph</span><span>CrewAI</span><span>Claude API</span><span>Gemini API</span><span>YOLOv8</span><span>OpenCV</span><span>Agentic Workflows</span></div>
-      </div>
-      <div class="skill-block">
-        <h3>Frontend</h3>
-        <div class="skill-tags"><span>React</span><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>Shadcn/UI</span><span>Vue.js</span></div>
-      </div>
-      <div class="skill-block">
-        <h3>Backend</h3>
-        <div class="skill-tags"><span>Node.js</span><span>Express</span><span>FastAPI</span><span>Supabase Edge Functions</span><span>Python</span><span>REST &amp; GraphQL</span><span>WebSockets</span></div>
-      </div>
-      <div class="skill-block">
-        <h3>Database</h3>
-        <div class="skill-tags"><span>PostgreSQL</span><span>Supabase</span><span>MongoDB</span><span>MySQL</span><span>Redis</span><span>Firebase</span></div>
-      </div>
-      <div class="skill-block">
-        <h3>Cloud &amp; DevOps</h3>
-        <div class="skill-tags"><span>AWS (EC2, S3, Lambda)</span><span>Vercel</span><span>Docker</span><span>Kubernetes</span><span>GitHub Actions</span><span>Prometheus</span><span>Grafana</span></div>
-      </div>
-      <div class="skill-block">
-        <h3>Web3 &amp; Payments</h3>
-        <div class="skill-tags"><span>Web3.js</span><span>Ethers.js</span><span>Ethereum</span><span>Polygon</span><span>ERC20</span><span>Stripe</span><span>Razorpay</span></div>
-      </div>
+      <div class="skill-block"><h3>AI</h3><div class="skill-tags"><span>LangGraph</span><span>CrewAI</span><span>Claude API</span><span>Gemini</span><span>YOLOv8</span><span>OpenCV</span></div></div>
+      <div class="skill-block"><h3>Frontend</h3><div class="skill-tags"><span>React</span><span>Next.js</span><span>TypeScript</span><span>Tailwind</span></div></div>
+      <div class="skill-block"><h3>Backend</h3><div class="skill-tags"><span>Node.js</span><span>FastAPI</span><span>Supabase</span><span>Python</span></div></div>
+      <div class="skill-block"><h3>Cloud</h3><div class="skill-tags"><span>AWS</span><span>Vercel</span><span>Docker</span><span>GitHub Actions</span></div></div>
+      <div class="skill-block"><h3>Web3</h3><div class="skill-tags"><span>Web3.js</span><span>Ethereum</span><span>Polygon</span><span>ERC20</span></div></div>
+      <div class="skill-block"><h3>Commerce</h3><div class="skill-tags"><span>Shopify</span><span>WordPress</span><span>Stripe</span><span>Razorpay</span></div></div>
+    </div>
+
+    <div class="hobby-row" style="margin-top:12px;">
+      <div class="hobby"><span class="hi">🏋️</span><h4>Lifting</h4><p>5–6x a week.</p></div>
+      <div class="hobby"><span class="hi">🎵</span><h4>Producing</h4><p>Lo-fi beats, FL Studio.</p></div>
+      <div class="hobby"><span class="hi">📚</span><h4>Reading</h4><p>Systems &amp; security.</p></div>
+      <div class="hobby"><span class="hi">🎮</span><h4>Gaming</h4><p>Strategy &amp; RPGs.</p></div>
     </div>
   </section>
 
-  <!-- HOBBIES -->
-  <section class="section" id="hobbies">
-    <div class="section-head">
-      <div>
-        <div class="section-tag">05 / outside work</div>
-        <h2 class="section-title">Off the clock</h2>
-      </div>
+  <!-- CONTACT — PEGASUS -->
+  <section class="zone" id="pegasus">
+    <div class="zone-head">
+      <div class="zc-row"><div class="zone-const">Pegasus</div><div class="zone-num">the winged one</div></div>
     </div>
-    <div class="hobby-row">
-      <div class="hobby"><span class="hi">🏋️</span><h4>Lifting</h4><p>5–6 days a week. Strength and hypertrophy, compound movements first.</p></div>
-      <div class="hobby"><span class="hi">🎵</span><h4>Producing</h4><p>Electronic and lo-fi beats in FL Studio and Ableton. Best debugging happens with good music on.</p></div>
-      <div class="hobby"><span class="hi">📚</span><h4>Reading</h4><p>Distributed systems, agentic AI design, and Web3 protocols for fun.</p></div>
-      <div class="hobby"><span class="hi">🎮</span><h4>Gaming</h4><p>Strategy games and RPGs — mostly for the game economics and UX design.</p></div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section class="section" id="contact">
     <div class="contact-wrap">
       <div class="contact-title">Got something worth <em>building</em>?</div>
-      <p class="contact-sub">I'm currently open for freelance projects, contract work, and full-time roles. Reach out and let's talk.</p>
+      <p class="contact-sub">Open for freelance, contract, and full-time work. Reach out.</p>
       <div class="contact-rows">
-        <a class="contact-row" href="mailto:ayush.pahuja090@gmail.com">
-          <span><span class="ck">email</span><br><span class="cv">ayush.pahuja090@gmail.com</span></span>
-          <span class="arrow">↗</span>
-        </a>
-        <a class="contact-row" href="tel:+918503022066">
-          <span><span class="ck">phone</span><br><span class="cv">+91 85030 22066</span></span>
-          <span class="arrow">↗</span>
-        </a>
-        <a class="contact-row" href="https://github.com/Lowdata" target="_blank" rel="noopener">
-          <span><span class="ck">github</span><br><span class="cv">github.com/Lowdata</span></span>
-          <span class="arrow">↗</span>
-        </a>
-        <a class="contact-row" href="https://linkedin.com/in/ayush-pahuja-b4455b17b" target="_blank" rel="noopener">
-          <span><span class="ck">linkedin</span><br><span class="cv">/in/ayush-pahuja-b4455b17b</span></span>
-          <span class="arrow">↗</span>
-        </a>
+        <a class="contact-row" href="mailto:ayush.pahuja090@gmail.com"><span><span class="ck">email</span><br><span class="cv">ayush.pahuja090@gmail.com</span></span><span>↗</span></a>
+        <a class="contact-row" href="tel:+918503022066"><span><span class="ck">phone</span><br><span class="cv">+91 85030 22066</span></span><span>↗</span></a>
+        <a class="contact-row" href="https://github.com/Lowdata" target="_blank" rel="noopener"><span><span class="ck">github</span><br><span class="cv">github.com/Lowdata</span></span><span>↗</span></a>
+        <a class="contact-row" href="https://linkedin.com/in/ayush-pahuja-b4455b17b" target="_blank" rel="noopener"><span><span class="ck">linkedin</span><br><span class="cv">/in/ayush-pahuja-b4455b17b</span></span><span>↗</span></a>
       </div>
     </div>
   </section>
 
-  <footer>AyushOS — rebuilt, not rebooted. © 2026 Ayush Pahuja.</footer>
+  <footer>Charted, not templated. © 2026 Ayush Pahuja.</footer>
 
 </main>
+
+<script>
+(function(){
+  var canvas = document.getElementById('sky');
+  var ctx = canvas.getContext('2d');
+  var stars = [];
+  var W, H;
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = document.documentElement.scrollHeight;
+    canvas.style.height = H + 'px';
+    generate();
+  }
+
+  function generate(){
+    var count = Math.floor((W * H) / 9000);
+    count = Math.min(count, 420);
+    stars = [];
+    for (var i = 0; i < count; i++){
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.2 + 0.3,
+        baseAlpha: Math.random() * 0.5 + 0.25,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.008 + 0.004,
+        link: Math.random() < 0.16
+      });
+    }
+  }
+
+  function draw(t){
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#07080C';
+    ctx.fillRect(0, 0, W, H);
+
+    // faint constellation links between nearby "link" stars
+    ctx.strokeStyle = 'rgba(143,175,217,0.10)';
+    ctx.lineWidth = 1;
+    var linkStars = stars.filter(function(s){return s.link;});
+    for (var i = 0; i < linkStars.length; i++){
+      for (var j = i + 1; j < linkStars.length; j++){
+        var a = linkStars[i], b = linkStars[j];
+        var dx = a.x - b.x, dy = a.y - b.y;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 180){
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    for (var k = 0; k < stars.length; k++){
+      var s = stars[k];
+      var alpha = reduceMotion ? s.baseAlpha : s.baseAlpha + Math.sin(t * s.speed + s.phase) * 0.2;
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(242,241,237,' + Math.max(0, Math.min(1, alpha)) + ')';
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function loop(t){
+    draw(t || 0);
+    if (!reduceMotion) requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  if (reduceMotion){
+    draw(0);
+  } else {
+    requestAnimationFrame(loop);
+  }
+})();
+</script>
+
 </body>
 </html>
