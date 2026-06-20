@@ -1,849 +1,658 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self';">
-    <title>Ayush Pahuja - Portfolio OS</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg-primary: #0e0e0e; --bg-secondary: #1a1a1a;
-            --text-primary: #00ff00; --text-secondary: #33ff33;
-            --accent: #00ff00; --border: #00ff00; --shadow: rgba(0,255,0,0.3);
-        }
-        body.theme-ubuntu {
-            --bg-primary:#2c001e; --bg-secondary:#300a24; --text-primary:#ffffff;
-            --text-secondary:#e95420; --accent:#e95420; --border:#e95420; --shadow:rgba(233,84,32,0.3);
-        }
-        body.theme-matrix {
-            --bg-primary:#000000; --bg-secondary:#001a00; --text-primary:#00ff00;
-            --text-secondary:#00cc00; --accent:#00ff00; --border:#00ff00; --shadow:rgba(0,255,0,0.5);
-        }
-        body.theme-retro {
-            --bg-primary:#000080; --bg-secondary:#0000aa; --text-primary:#ffff55;
-            --text-secondary:#ffffff; --accent:#ffff55; --border:#ffff55; --shadow:rgba(255,255,85,0.3);
-        }
-        body { font-family:'Courier New',monospace; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; caret-color:transparent; }
-        .top-bar { background:var(--bg-secondary); padding:8px 15px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); box-shadow:0 2px 10px var(--shadow); }
-        .top-bar-left { display:flex; align-items:center; gap:20px; }
-        .logo { font-weight:bold; font-size:16px; color:var(--accent); }
-        .tabs { display:flex; gap:5px; }
-        .tab { padding:5px 15px; background:var(--bg-primary); border:1px solid var(--border); cursor:pointer; transition:all 0.3s; user-select:none; }
-        .tab:hover { background:var(--border); color:var(--bg-primary); }
-        .tab.active { background:var(--accent); color:var(--bg-primary); font-weight:bold; }
-        .top-bar-right { display:flex; gap:15px; align-items:center; }
-        .theme-selector { background:var(--bg-primary); border:1px solid var(--border); color:var(--text-primary); padding:5px 10px; cursor:pointer; font-family:'Courier New',monospace; }
-        .time { font-size:14px; }
-        .terminal-container { display:none; height:calc(100vh - 50px); padding:20px; overflow-y:auto; padding-bottom:60px; }
-        .terminal-container.active { display:block; }
-        .terminal-output { margin-bottom:20px; white-space:pre-wrap; word-break:break-word; }
-        .terminal-line { margin:5px 0; line-height:1.5; }
-        .prompt { color:var(--text-secondary); }
-        .command { color:var(--accent); }
-        .terminal-input-container { position:fixed; bottom:0; left:0; right:0; background:var(--bg-primary); padding:15px 20px; border-top:2px solid var(--border); display:none; }
-        .terminal-input-container.active { display:block; }
-        .terminal-input-line { display:flex; align-items:center; gap:6px; }
-        .terminal-input { flex:1; background:transparent; border:none; color:var(--text-primary); font-family:'Courier New',monospace; font-size:14px; outline:none; caret-color:var(--accent); }
-        .ascii-art { color:var(--accent); font-size:10px; line-height:1.2; }
-        .desktop-container { display:none; height:calc(100vh - 50px); position:relative; background:linear-gradient(135deg,var(--bg-primary) 0%,var(--bg-secondary) 100%); overflow:hidden; }
-        .desktop-container.active { display:block; }
-        .desktop-icons { display:grid; grid-template-columns:repeat(auto-fill,100px); gap:30px; padding:30px; }
-        .icon { text-align:center; cursor:pointer; transition:all 0.2s ease; user-select:none; }
-        .icon:hover { transform:scale(1.1) translateY(-2px); }
-        .icon:active { transform:scale(1.05) translateY(0); }
-        .icon-image { width:64px; height:64px; background:var(--bg-secondary); margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:32px; border:2px solid var(--accent); box-shadow:0 4px 10px var(--shadow); transition:all 0.3s; filter:contrast(1.2) brightness(1.1); }
-        .icon:hover .icon-image { box-shadow:0 6px 20px var(--shadow); }
-        .icon-label { font-size:12px; text-shadow:2px 2px 4px rgba(0,0,0,0.8); }
-        .window { position:absolute; background:var(--bg-secondary); border:2px solid var(--border); box-shadow:0 8px 30px var(--shadow); min-width:400px; max-width:800px; max-height:80vh; display:none; z-index:100; opacity:0; transform:scale(0.8); transition:opacity 0.3s,transform 0.3s; border-radius:4px; }
-        .window.active { display:flex; flex-direction:column; animation:windowOpen 0.3s forwards; }
-        .window.closing { animation:windowClose 0.25s forwards; }
-        @keyframes windowOpen { from{opacity:0;transform:scale(0.8) translate(-50%,-50%)} to{opacity:1;transform:scale(1) translate(-50%,-50%)} }
-        @keyframes windowClose { from{opacity:1;transform:scale(1)} to{opacity:0;transform:scale(0.8)} }
-        .window-header { background:var(--accent); color:var(--bg-primary); padding:8px 15px; display:flex; justify-content:space-between; align-items:center; cursor:move; font-weight:bold; user-select:none; }
-        .window-controls { display:flex; gap:10px; }
-        .window-btn { width:20px; height:20px; background:var(--bg-primary); border:1px solid var(--bg-primary); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px; transition:all 0.2s; color:var(--text-primary); }
-        .window-btn:hover { background:#ff0000; border-color:#ff0000; color:#fff; }
-        .window-content { padding:20px; overflow-y:auto; flex:1; line-height:1.6; }
-        .window-content h2 { color:var(--accent); margin-bottom:15px; border-bottom:2px solid var(--border); padding-bottom:5px; }
-        .window-content h3 { color:var(--text-secondary); margin-top:15px; margin-bottom:10px; }
-        .project-item,.experience-item { margin-bottom:20px; padding:15px; background:var(--bg-primary); border-left:3px solid var(--accent); }
-        .skill-category { margin-bottom:15px; }
-        .skill-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-        .skill-tag { background:var(--accent); color:var(--bg-primary); padding:5px 10px; font-size:12px; border:1px solid var(--border); }
-        .skill-tag.ai-tag { background:transparent; color:var(--accent); border:1px solid var(--accent); font-weight:bold; }
-        .contact-links { display:flex; flex-direction:column; gap:10px; margin-top:15px; }
-        .contact-link { color:var(--accent); text-decoration:none; padding:10px; background:var(--bg-primary); border:1px solid var(--border); transition:all 0.3s; display:block; }
-        .contact-link:hover { background:var(--accent); color:var(--bg-primary); }
-        .hobby-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:15px; }
-        .hobby-card { background:var(--bg-primary); padding:15px; border:2px solid var(--border); }
-        ::-webkit-scrollbar { width:10px; height:10px; }
-        ::-webkit-scrollbar-track { background:var(--bg-primary); }
-        ::-webkit-scrollbar-thumb { background:var(--accent); border:1px solid var(--border); }
-        .error { color:#ff5555; } .success { color:#55ff55; } .warning { color:#ffff55; }
-        #matrixOverlay { position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity 0.3s; }
-        #matrixOverlay.active { opacity:0.9; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayush Pahuja — Full Stack AI Engineer</title>
+<meta name="description" content="Ayush Pahuja — Full Stack AI Engineer. Building agentic AI systems, scalable web platforms, and blockchain products.">
+<style>
+@font-face{font-family:'Fraunces';src:local('Georgia');}
+:root{
+  --bg:#0B0D10;
+  --bg-soft:#101317;
+  --surface:#15181C;
+  --surface-2:#1B1F24;
+  --line:#262B31;
+  --line-soft:#1E2227;
+  --ink:#F5F3EE;
+  --ink-dim:#A8AAA6;
+  --ink-faint:#6B6E6C;
+  --sage:#8FAFA4;
+  --sage-dim:#5E7A70;
+  --clay:#E8765C;
+  --clay-dim:#B8593F;
+  --gold:#D8B26A;
+  --radius:14px;
+  --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+  --serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit;}
+img{display:block;max-width:100%;}
+::selection{background:var(--clay);color:var(--bg);}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:10px;}
+
+/* focus visibility */
+a:focus-visible,button:focus-visible{outline:2px solid var(--sage);outline-offset:3px;border-radius:4px;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
+}
+
+/* ===== background texture ===== */
+.grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ===== status ledger (signature element) ===== */
+.ledger{
+  position:sticky;top:0;z-index:50;
+  background:rgba(11,13,16,0.92);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  font-family:var(--mono);
+  font-size:11.5px;
+  letter-spacing:0.02em;
+}
+.ledger-inner{
+  max-width:1180px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 28px;gap:16px;
+  overflow-x:auto;white-space:nowrap;
+}
+.ledger-left{display:flex;align-items:center;gap:18px;color:var(--ink-faint);}
+.ledger-item{display:flex;align-items:center;gap:7px;}
+.pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--sage);flex-shrink:0;animation:pulse 2.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(143,175,164,0.5);}50%{opacity:0.5;box-shadow:0 0 0 4px rgba(143,175,164,0);}}
+.ledger-status{color:var(--sage);}
+.ledger-nav{display:flex;gap:20px;}
+.ledger-nav a{color:var(--ink-faint);text-decoration:none;transition:color 0.2s;}
+.ledger-nav a:hover{color:var(--ink);}
+
+/* ===== layout shell ===== */
+.shell{max-width:1180px;margin:0 auto;padding:0 28px;position:relative;z-index:2;}
+section{position:relative;}
+
+/* ===== hero ===== */
+.hero{padding:120px 0 90px;}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--sage);margin-bottom:28px;display:flex;align-items:center;gap:10px;
+}
+.hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--sage);}
+h1.hero-title{
+  font-family:var(--serif);
+  font-weight:600;
+  font-size:clamp(42px,7vw,84px);
+  line-height:1.02;
+  letter-spacing:-0.01em;
+  max-width:880px;
+  color:var(--ink);
+}
+h1.hero-title em{
+  font-style:italic;color:var(--clay);font-weight:500;
+}
+.hero-sub{
+  margin-top:28px;max-width:600px;font-size:18px;color:var(--ink-dim);line-height:1.7;
+}
+.hero-actions{display:flex;gap:14px;margin-top:40px;flex-wrap:wrap;}
+.btn{
+  font-family:var(--sans);font-weight:600;font-size:14.5px;
+  padding:14px 26px;border-radius:999px;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;transition:all 0.25s ease;border:1px solid transparent;
+}
+.btn-primary{background:var(--ink);color:var(--bg);}
+.btn-primary:hover{background:var(--sage);transform:translateY(-1px);}
+.btn-ghost{border-color:var(--line);color:var(--ink);}
+.btn-ghost:hover{border-color:var(--sage);color:var(--sage);transform:translateY(-1px);}
+
+.hero-meta{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;margin-top:72px;
+  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+  background:var(--line);
+}
+.hero-meta-item{background:var(--bg-soft);padding:22px 24px;}
+.hero-meta-num{font-family:var(--serif);font-size:30px;color:var(--ink);}
+.hero-meta-label{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:6px;}
+
+/* ===== section heads ===== */
+.section{padding:90px 0;border-top:1px solid var(--line-soft);}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;margin-bottom:52px;flex-wrap:wrap;}
+.section-tag{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sage);}
+h2.section-title{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4vw,44px);margin-top:10px;letter-spacing:-0.01em;}
+.section-note{font-size:14px;color:var(--ink-faint);max-width:280px;text-align:right;}
+
+/* ===== about ===== */
+.about-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:64px;align-items:start;}
+.about-lead{font-family:var(--serif);font-size:24px;line-height:1.45;color:var(--ink);font-weight:500;}
+.about-lead em{color:var(--clay);font-style:italic;}
+.about-body{margin-top:24px;color:var(--ink-dim);font-size:15.5px;line-height:1.8;}
+.about-body p{margin-bottom:16px;}
+.about-side{display:flex;flex-direction:column;gap:14px;}
+.fact-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;}
+.fact-card .fk{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;}
+.fact-card .fv{font-size:15px;color:var(--ink);}
+.fact-card .fv strong{color:var(--sage);}
+
+/* ===== timeline (experience) ===== */
+.tl{position:relative;}
+.tl-item{display:grid;grid-template-columns:140px 1fr;gap:40px;padding:36px 0;border-top:1px solid var(--line-soft);}
+.tl-item:first-child{border-top:none;}
+.tl-period{font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);padding-top:4px;}
+.tl-role{font-family:var(--serif);font-size:23px;color:var(--ink);font-weight:600;}
+.tl-org{color:var(--sage);font-size:14.5px;margin-top:4px;font-weight:600;}
+.tl-list{margin-top:16px;color:var(--ink-dim);font-size:14.5px;line-height:1.8;}
+.tl-list li{margin-bottom:8px;padding-left:18px;position:relative;}
+.tl-list li::before{content:'';position:absolute;left:0;top:9px;width:6px;height:1px;background:var(--sage-dim);}
+.tl-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
+.chip{font-family:var(--mono);font-size:11px;color:var(--ink-dim);border:1px solid var(--line);padding:5px 11px;border-radius:999px;}
+
+/* ===== projects ===== */
+.proj-grid{display:flex;flex-direction:column;gap:18px;}
+.proj{
+  border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);
+  padding:30px 32px;
+  display:grid;grid-template-columns:1fr 280px;gap:32px;
+  transition:border-color 0.25s ease, transform 0.25s ease;
+}
+.proj:hover{border-color:var(--sage-dim);transform:translateY(-2px);}
+.proj.featured{
+  background:linear-gradient(155deg,#16201D 0%,var(--surface) 60%);
+  border-color:var(--sage-dim);
+}
+.proj-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.status-pill{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.07em;text-transform:uppercase;
+  padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;
+}
+.status-pill.live{background:rgba(143,175,164,0.14);color:var(--sage);}
+.status-pill.live .pulse-dot{background:var(--sage);}
+.status-pill.progress{background:rgba(216,178,106,0.14);color:var(--gold);}
+.status-pill.progress .pulse-dot{background:var(--gold);animation:none;}
+.status-pill.archived{background:rgba(168,170,166,0.1);color:var(--ink-faint);}
+.proj-title{font-family:var(--serif);font-size:24px;color:var(--ink);font-weight:600;margin-top:14px;}
+.proj-desc{margin-top:10px;color:var(--ink-dim);font-size:14.5px;line-height:1.7;max-width:520px;}
+.proj-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
+.proj-links{display:flex;flex-direction:column;gap:10px;justify-content:center;}
+.proj-link{
+  font-family:var(--sans);font-weight:600;font-size:13.5px;
+  padding:13px 18px;border-radius:10px;text-decoration:none;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border:1px solid var(--line);color:var(--ink);transition:all 0.2s ease;
+}
+.proj-link:hover{border-color:var(--sage);color:var(--sage);}
+.proj-link.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.proj-link.primary:hover{background:var(--sage);border-color:var(--sage);color:var(--bg);}
+.proj-link.disabled{opacity:0.45;pointer-events:none;}
+.proj-link .arrow{transition:transform 0.2s ease;}
+.proj-link:hover .arrow{transform:translate(3px,-3px);}
+
+@media (max-width: 760px){
+  .proj{grid-template-columns:1fr;}
+  .proj-links{flex-direction:row;flex-wrap:wrap;}
+}
+
+/* ===== skills ===== */
+.skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+.skill-block{background:var(--bg-soft);padding:26px 28px;}
+.skill-block h3{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--sage);margin-bottom:16px;}
+.skill-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.skill-tags span{font-size:13px;color:var(--ink-dim);}
+.skill-tags span:not(:last-child)::after{content:'·';color:var(--ink-faint);margin-left:8px;}
+
+@media (max-width:900px){.skill-grid{grid-template-columns:1fr;}}
+
+/* ===== hobbies ===== */
+.hobby-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+.hobby{background:var(--bg-soft);padding:28px 24px;}
+.hobby .hi{font-size:26px;margin-bottom:14px;display:block;}
+.hobby h4{font-family:var(--serif);font-size:17px;color:var(--ink);margin-bottom:8px;}
+.hobby p{font-size:13px;color:var(--ink-faint);line-height:1.6;}
+@media (max-width:900px){.hobby-row{grid-template-columns:repeat(2,1fr);}}
+
+/* ===== contact ===== */
+.contact-wrap{
+  border:1px solid var(--line);border-radius:24px;
+  padding:64px 56px;
+  background:radial-gradient(circle at 20% 20%, rgba(143,175,164,0.08), transparent 60%);
+  text-align:left;
+}
+.contact-title{font-family:var(--serif);font-size:clamp(32px,5vw,54px);font-weight:600;max-width:620px;line-height:1.1;}
+.contact-title em{color:var(--clay);font-style:italic;}
+.contact-sub{margin-top:18px;color:var(--ink-dim);font-size:16px;max-width:460px;}
+.contact-rows{margin-top:40px;display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line);}
+.contact-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:20px 4px;border-bottom:1px solid var(--line);
+  text-decoration:none;color:var(--ink);transition:padding-left 0.2s ease;
+}
+.contact-row:hover{padding-left:12px;color:var(--sage);}
+.contact-row .ck{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.06em;text-transform:uppercase;}
+.contact-row .cv{font-size:16px;font-weight:600;}
+.contact-row .arrow{color:var(--ink-faint);transition:transform 0.2s ease;}
+.contact-row:hover .arrow{transform:translate(4px,-4px);color:var(--sage);}
+
+footer{padding:36px 0 60px;text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);}
+
+@media (max-width:860px){
+  .hero{padding:90px 0 60px;}
+  .hero-meta{grid-template-columns:repeat(2,1fr);}
+  .about-grid{grid-template-columns:1fr;gap:36px;}
+  .tl-item{grid-template-columns:1fr;gap:10px;}
+  .section{padding:64px 0;}
+  .contact-wrap{padding:40px 26px;}
+  .ledger-nav{display:none;}
+}
+@media (max-width:500px){
+  .shell{padding:0 18px;}
+  h1.hero-title{font-size:38px;}
+}
+</style>
 </head>
-<body class="theme-matrix">
-    <div class="top-bar">
-        <div class="top-bar-left">
-            <div class="logo">AyushOS v1.0</div>
-            <div class="tabs">
-                <div class="tab active" data-mode="terminal">Terminal</div>
-                <div class="tab" data-mode="desktop">Desktop</div>
-            </div>
-        </div>
-        <div class="top-bar-right">
-            <select class="theme-selector" id="themeSelector">
-                <option value="matrix">Matrix</option>
-                <option value="ubuntu">Ubuntu</option>
-                <option value="retro">Retro</option>
-            </select>
-            <div class="time" id="clock"></div>
-        </div>
+<body>
+<div class="grain"></div>
+
+<div class="ledger">
+  <div class="ledger-inner">
+    <div class="ledger-left">
+      <span class="ledger-item"><span class="pulse-dot"></span><span class="ledger-status">available for work</span></span>
+      <span class="ledger-item">delhi, in</span>
+      <span class="ledger-item">latest build: swatch</span>
+    </div>
+    <div class="ledger-nav">
+      <a href="#about">about</a>
+      <a href="#experience">work</a>
+      <a href="#projects">projects</a>
+      <a href="#skills">skills</a>
+      <a href="#contact">contact</a>
+    </div>
+  </div>
+</div>
+
+<main class="shell">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">full stack &amp; ai engineer</div>
+    <h1 class="hero-title">I build systems that learn, ship, <em>and don't fall over.</em></h1>
+    <p class="hero-sub">Ayush Pahuja — two years deep in agentic AI workflows, production-grade web platforms, and blockchain infrastructure. I take products from a blank repo to thousands of real users.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#projects">See the work ↓</a>
+      <a class="btn btn-ghost" href="mailto:ayush.pahuja090@gmail.com">Get in touch</a>
     </div>
 
-    <div class="terminal-container active" id="terminalMode">
-        <div class="terminal-output" id="terminalOutput">
-<pre class="ascii-art">
-    ___                       __       ____        __          _     
-   /   | __  ____  ________ / /_     / __ \____ _/ /_  __  __(_)___ 
-  / /| |/ / / / / / / ___// __ \   / /_/ / __ `/ __ \/ / / / / __ \
- / ___ / /_/ / /_/ (__  )/ / / /  / ____/ /_/ / / / / /_/ / / /_/ /
-/_/  |_\__, /\__,_/____//_/ /_/  /_/    \__,_/_/ /_/\__,_/_/\__/\__/
-      /____/                                                          
-</pre>
-            <div class="terminal-line">AyushOS v1.0 - Interactive Portfolio Terminal</div>
-            <div class="terminal-line">Full Stack AI Engineer | DevOps | Blockchain Enthusiast</div>
-            <div class="terminal-line">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
-            <div class="terminal-line"></div>
-        </div>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <div class="hero-meta-num">2+</div>
+        <div class="hero-meta-label">Years in production</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-num">50K+</div>
+        <div class="hero-meta-label">Users served</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-num">7</div>
+        <div class="hero-meta-label">Shipped products</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-num">0</div>
+        <div class="hero-meta-label">Security breaches</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="section-head">
+      <div>
+        <div class="section-tag">01 / about</div>
+        <h2 class="section-title">From circuits to agents</h2>
+      </div>
+      <div class="section-note">B.Tech ECE, NSUT East Campus, Delhi — then a hard pivot into AI &amp; full-stack engineering.</div>
     </div>
 
-    <div class="terminal-input-container active" id="terminalInputContainer">
-        <div class="terminal-input-line">
-            <span class="prompt">visitor@ayush-portfolio:~$</span>
-            <input type="text" class="terminal-input" id="terminalInput" autofocus autocomplete="off" spellcheck="false">
+    <div class="about-grid">
+      <div>
+        <p class="about-lead">I build AI-powered products that don't just work — they <em>perform</em> under real users, real load, and real deadlines.</p>
+        <div class="about-body">
+          <p>I own features end-to-end: wiring Claude and Gemini into LangGraph multi-agent workflows, training YOLOv8 models for computer vision, and shipping zero-downtime deployments on AWS and Vercel.</p>
+          <p>My background started in electronics and signals at NSUT — by the time I graduated, I'd already moved into AI pipelines and Web3, and never looked back.</p>
         </div>
+      </div>
+      <div class="about-side">
+        <div class="fact-card">
+          <div class="fk">Currently</div>
+          <div class="fv">Open for <strong>freelance, contract, and full-time</strong> roles in AI engineering and full-stack development.</div>
+        </div>
+        <div class="fact-card">
+          <div class="fk">Philosophy</div>
+          <div class="fv">"Write code that works today and makes sense tomorrow. Test like you expect it to break. Deploy like you're confident it won't."</div>
+        </div>
+        <div class="fact-card">
+          <div class="fk">Outside of work</div>
+          <div class="fv">Lifting <strong>5–6 days/week</strong>, producing lo-fi beats, and reading about distributed systems for fun.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="section" id="experience">
+    <div class="section-head">
+      <div>
+        <div class="section-tag">02 / experience</div>
+        <h2 class="section-title">Where I've worked</h2>
+      </div>
+      <div class="section-note">Remote roles across AI infrastructure, Web3, and full-stack product engineering.</div>
     </div>
 
-    <div class="desktop-container" id="desktopMode">
-        <canvas id="matrixOverlay"></canvas>
-        <div class="desktop-icons">
-            <div class="icon" data-window="about"><div class="icon-image">👨‍💻</div><div class="icon-label">About Me</div></div>
-            <div class="icon" data-window="experience"><div class="icon-image">💼</div><div class="icon-label">Experience</div></div>
-            <div class="icon" data-window="projects"><div class="icon-image">🚀</div><div class="icon-label">Projects</div></div>
-            <div class="icon" data-window="skills"><div class="icon-image">🛠️</div><div class="icon-label">Skills</div></div>
-            <div class="icon" data-window="hobbies"><div class="icon-image">🎯</div><div class="icon-label">Hobbies</div></div>
-            <div class="icon" data-window="contact"><div class="icon-image">📧</div><div class="icon-label">Contact</div></div>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-period">Jun 2024 —<br>Sep 2025</div>
+        <div>
+          <div class="tl-role">Full Stack &amp; AI Engineer</div>
+          <div class="tl-org">Vegavid Technologies · Remote</div>
+          <ul class="tl-list">
+            <li>Engineered AI-driven apps integrating Claude and Gemini APIs; implemented LangGraph for multi-agent orchestration.</li>
+            <li>Trained and fine-tuned YOLOv8 models; used OpenCV for image processing and visualisation.</li>
+            <li>Architected the Iberia Gold token sale platform — secure ERC20 purchases via Stripe and USDT on Polygon.</li>
+            <li>Built an automated autosweep service using Node.js crons to aggregate treasury funds.</li>
+            <li>Migrated infrastructure to Supabase (Edge Functions, Auth) with Tailwind CSS on the frontend.</li>
+            <li>Containerised AI services with Docker; set up GitHub Actions for zero-downtime deploys on Vercel and EC2.</li>
+            <li>Scaled systems to 50K+ users, monitored with Prometheus and Grafana.</li>
+          </ul>
+          <div class="tl-stack">
+            <span class="chip">Claude API</span><span class="chip">LangGraph</span><span class="chip">YOLOv8</span>
+            <span class="chip">Supabase</span><span class="chip">Docker</span><span class="chip">AWS EC2</span>
+          </div>
         </div>
+      </div>
 
-        <!-- ABOUT WINDOW -->
-        <div class="window" id="aboutWindow">
-            <div class="window-header"><span>About Me</span><div class="window-controls"><div class="window-btn close-btn">×</div></div></div>
-            <div class="window-content">
-                <h2>Hey there! I'm Ayush 👋</h2>
-                <p>Full Stack AI Engineer with 2+ years building production-ready systems at the intersection of intelligent automation, scalable web architecture, and blockchain. I own features end-to-end — from training YOLOv8 models to deploying multi-agent LLM workflows in production.</p>
-                <h3>🎓 The Academic Chapter</h3>
-                <p>B.Tech in Electronics and Communication Engineering from NSUT East Campus, Delhi (2019–2023). Started with circuits and signals, ended up deep in AI pipelines and Web3. Life's funny that way!</p>
-                <h3>💡 What I Do Best</h3>
-                <p>I build AI-powered full-stack applications that don't just work — they <em>perform</em>. Whether it's wiring up Claude &amp; Gemini APIs into LangGraph agentic workflows, training computer vision models, or shipping zero-downtime deployments on AWS, I'm all in.</p>
-                <p style="margin-top:15px;">Some highlights from my journey:</p>
-                <ul style="margin-left:20px;margin-top:10px;">
-                    <li>Architected systems supporting 50K+ users — monitored via Prometheus &amp; Grafana</li>
-                    <li>Cut deployment cycles from 2 hours → 15 minutes with Docker + GitHub Actions</li>
-                    <li>Trained &amp; fine-tuned YOLOv8 models for custom object detection tasks</li>
-                    <li>Built secure ERC20 token sale platforms with Stripe + USDT (Polygon)</li>
-                    <li>Zero security breaches across all production AI &amp; blockchain platforms</li>
-                </ul>
-                <h3>🚀 My Philosophy</h3>
-                <p><em>"Write code that works today and makes sense tomorrow. Test like you expect it to break. Deploy like you're confident it won't."</em></p>
-            </div>
+      <div class="tl-item">
+        <div class="tl-period">Jan 2023 —<br>Jun 2024</div>
+        <div>
+          <div class="tl-role">Full Stack Developer</div>
+          <div class="tl-org">OneRare · Remote</div>
+          <ul class="tl-list">
+            <li>Built dApps with React.js and Web3.js, with smart contracts on Ethereum and Polygon.</li>
+            <li>Managed backend APIs on AWS EC2 with CloudWatch — 99.9% uptime through NFT sale events.</li>
+            <li>Automated containerised workflows with Docker Compose and GitHub Actions.</li>
+            <li>Implemented JWT and OAuth 2.0 authentication across distributed services.</li>
+          </ul>
+          <div class="tl-stack">
+            <span class="chip">React.js</span><span class="chip">Web3.js</span><span class="chip">Ethereum</span>
+            <span class="chip">AWS EC2</span><span class="chip">OAuth 2.0</span>
+          </div>
         </div>
+      </div>
 
-        <!-- EXPERIENCE WINDOW — UPDATED -->
-        <div class="window" id="experienceWindow">
-            <div class="window-header"><span>Work Experience</span><div class="window-controls"><div class="window-btn close-btn">×</div></div></div>
-            <div class="window-content">
-                <h2>Where I've Made an Impact 💼</h2>
-
-                <div class="experience-item">
-                    <h3>🤖 Full Stack &amp; AI Engineer @ Vegavid Technologies</h3>
-                    <p><em>Jun 2024 – Sep 2025 | Remote</em></p>
-                    <p style="margin-top:10px;">Building production-grade AI tools and scalable DevOps infrastructure:</p>
-                    <ul style="margin-left:20px;margin-top:10px;">
-                        <li>Engineered AI-driven apps integrating <strong>Claude</strong> and <strong>Gemini APIs</strong>; implemented <strong>LangGraph</strong> for complex multi-agent orchestration and production-oriented workflows</li>
-                        <li>Trained &amp; fine-tuned <strong>YOLOv8</strong> models for custom object detection; used <strong>OpenCV</strong> for advanced image processing and data visualisation</li>
-                        <li>Architected a secure <strong>Iberia Gold Token Sale Platform</strong> — ERC20 purchases via Stripe and USDT (Polygon), with PostgreSQL ensuring high-value transactional integrity</li>
-                        <li>Developed an automated <strong>autosweep service</strong> using Node.js crons to aggregate treasury funds, reducing manual overhead and hardening security protocols</li>
-                        <li>Migrated legacy components to <strong>Supabase</strong> (Edge Functions, Auth) + Tailwind CSS, improving development velocity and frontend responsiveness</li>
-                        <li>Containerised AI services with <strong>Docker</strong>; established <strong>GitHub Actions</strong> pipelines for zero-downtime deployments on Vercel and AWS EC2</li>
-                        <li>Scaled systems to 50K+ users with high-availability monitoring via <strong>Prometheus &amp; Grafana</strong></li>
-                    </ul>
-                </div>
-
-                <div class="experience-item">
-                    <h3>⛓️ Full Stack Developer @ OneRare</h3>
-                    <p><em>Jan 2023 – Jun 2024 | Remote</em></p>
-                    <p style="margin-top:10px;">Diving into Web3 and blockchain-integrated applications at production scale:</p>
-                    <ul style="margin-left:20px;margin-top:10px;">
-                        <li>Built dApps with <strong>React.js</strong>, <strong>Web3.js</strong>, and smart contracts on <strong>Ethereum</strong> and <strong>Polygon</strong></li>
-                        <li>Managed backend APIs on <strong>AWS EC2</strong> with CloudWatch monitoring — 99.9% stability during high-traffic NFT sales events</li>
-                        <li>Automated containerised workflows with <strong>Docker Compose</strong> and <strong>GitHub Actions</strong> for rapid staging-to-production cycles</li>
-                        <li>Implemented <strong>JWT &amp; OAuth 2.0</strong> authentication systems across distributed services</li>
-                    </ul>
-                </div>
-
-                <h3 style="margin-top:25px;">🛒 E-Commerce Expertise</h3>
-                <p style="margin-top:10px;"><strong>Shopify:</strong> Custom themes, app integrations, conversion optimisation, headless storefront with Next.js.</p>
-                <p style="margin-top:10px;"><strong>WordPress:</strong> Custom plugins, theme development, WooCommerce, speed, security &amp; scalability.</p>
-            </div>
+      <div class="tl-item">
+        <div class="tl-period">E-commerce</div>
+        <div>
+          <div class="tl-role">Shopify &amp; WordPress</div>
+          <div class="tl-org">Independent client work</div>
+          <ul class="tl-list">
+            <li>Custom Shopify themes, app integrations, and conversion-focused storefronts — including headless builds with Next.js.</li>
+            <li>WordPress plugin and theme development, WooCommerce stores tuned for speed, security, and scale.</li>
+          </ul>
+          <div class="tl-stack">
+            <span class="chip">Shopify Liquid</span><span class="chip">WooCommerce</span><span class="chip">Next.js</span>
+          </div>
         </div>
+      </div>
+    </div>
+  </section>
 
-        <!-- PROJECTS WINDOW -->
-        <div class="window" id="projectsWindow">
-            <div class="window-header"><span>Projects</span><div class="window-controls"><div class="window-btn close-btn">×</div></div></div>
-            <div class="window-content">
-                <h2>Things I've Built 🚀</h2>
-                <div class="project-item">
-                    <h3>Iberia Gold Token Sale Platform</h3>
-                    <p><em>React • Node.js • PostgreSQL • Stripe • Web3.js • Polygon</em></p>
-                    <p style="margin-top:10px;">Secure ERC20 token sale platform supporting purchases via Stripe and USDT on Polygon. High-value transactional integrity with PostgreSQL, plus an automated autosweep cron service for treasury fund aggregation. Zero security breaches in production.</p>
-                </div>
-                <div class="project-item">
-                    <h3>WhatsApp Chat Analytics Platform</h3>
-                    <p><em>React • Node.js • Express • MongoDB • Chart.js</em></p>
-                    <p style="margin-top:10px;">Processes 1M+ messages to deliver insights you never knew you needed. Real-time analytics, beautiful visualisations, and 60% faster DB queries. Because data should be fast AND pretty.</p>
-                </div>
-                <div class="project-item">
-                    <h3>Customer Management System</h3>
-                    <p><em>React • Node.js • MongoDB • JWT • Stripe API</em></p>
-                    <p style="margin-top:10px;">CRM that actually makes sense. 500+ customers, 2K+ transactions, role-based access, Stripe payments, automated invoicing — all optimised to feel instant.</p>
-                </div>
-                <div class="project-item">
-                    <h3>Crypto Wallet Application</h3>
-                    <p><em>React Native • Node.js • Firebase • Web3.js</em></p>
-                    <p style="margin-top:10px;">Cross-platform mobile wallet supporting Ethereum and Polygon. Real-time prices, push notifications, WebSocket connections. 5K+ monthly users trust it with their digital assets.</p>
-                </div>
-                <div class="project-item">
-                    <h3>Catoff Protocol (Open Source)</h3>
-                    <p><em>Node.js • Express • React.js • D3.js • Smart Contracts</em></p>
-                    <p style="margin-top:10px;">Bridging Web2 and Web3 — YouTube APIs with blockchain smart contracts, decentralised verification, analytics dashboards. 10+ merged PRs with the global dev community.</p>
-                </div>
-                <p style="margin-top:20px;color:var(--text-secondary);">
-                    🔗 Explore more on my <a href="https://github.com/Lowdata" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GitHub</a>
-                </p>
-            </div>
-        </div>
-
-        <!-- SKILLS WINDOW — UPDATED -->
-        <div class="window" id="skillsWindow">
-            <div class="window-header"><span>Technical Skills</span><div class="window-controls"><div class="window-btn close-btn">×</div></div></div>
-            <div class="window-content">
-                <h2>My Technical Arsenal ⚡</h2>
-
-                <div class="skill-category">
-                    <h3>🤖 AI &amp; Orchestration</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag ai-tag">LangChain</span>
-                        <span class="skill-tag ai-tag">LangGraph</span>
-                        <span class="skill-tag ai-tag">CrewAI</span>
-                        <span class="skill-tag ai-tag">Claude API</span>
-                        <span class="skill-tag ai-tag">Gemini API</span>
-                        <span class="skill-tag ai-tag">YOLOv8</span>
-                        <span class="skill-tag ai-tag">OpenCV</span>
-                        <span class="skill-tag ai-tag">LLM Prompt Engineering</span>
-                        <span class="skill-tag ai-tag">Agentic Workflows</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Frontend Wizardry</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">React.js</span>
-                        <span class="skill-tag">Next.js</span>
-                        <span class="skill-tag">TypeScript</span>
-                        <span class="skill-tag">JavaScript (ES6+)</span>
-                        <span class="skill-tag">Tailwind CSS</span>
-                        <span class="skill-tag">Shadcn/UI</span>
-                        <span class="skill-tag">Vue.js</span>
-                        <span class="skill-tag">HTML5 / CSS3</span>
-                        <span class="skill-tag">Bootstrap</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Backend Engineering</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">Node.js</span>
-                        <span class="skill-tag">Express.js</span>
-                        <span class="skill-tag">Supabase Edge Functions</span>
-                        <span class="skill-tag">Python</span>
-                        <span class="skill-tag">Django</span>
-                        <span class="skill-tag">Flask</span>
-                        <span class="skill-tag">Java / Spring Boot</span>
-                        <span class="skill-tag">REST APIs</span>
-                        <span class="skill-tag">GraphQL</span>
-                        <span class="skill-tag">WebSockets</span>
-                        <span class="skill-tag">Microservices</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Database Mastery</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">PostgreSQL</span>
-                        <span class="skill-tag">Supabase</span>
-                        <span class="skill-tag">MongoDB</span>
-                        <span class="skill-tag">MySQL</span>
-                        <span class="skill-tag">Redis</span>
-                        <span class="skill-tag">Firebase</span>
-                        <span class="skill-tag">DynamoDB</span>
-                        <span class="skill-tag">AWS RDS</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Cloud &amp; DevOps</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">AWS (EC2, S3, RDS, Lambda)</span>
-                        <span class="skill-tag">Vercel</span>
-                        <span class="skill-tag">Google Cloud Platform</span>
-                        <span class="skill-tag">Docker</span>
-                        <span class="skill-tag">Docker Compose</span>
-                        <span class="skill-tag">Kubernetes</span>
-                        <span class="skill-tag">GitHub Actions CI/CD</span>
-                        <span class="skill-tag">NGINX</span>
-                        <span class="skill-tag">Prometheus</span>
-                        <span class="skill-tag">Grafana</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Data Analytics</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">Python (Pandas, NumPy)</span>
-                        <span class="skill-tag">SQL</span>
-                        <span class="skill-tag">Matplotlib</span>
-                        <span class="skill-tag">Tableau</span>
-                        <span class="skill-tag">Power BI</span>
-                        <span class="skill-tag">Excel</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Web3 &amp; Blockchain</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">Web3.js</span>
-                        <span class="skill-tag">Ethers.js</span>
-                        <span class="skill-tag">Smart Contracts</span>
-                        <span class="skill-tag">Ethereum</span>
-                        <span class="skill-tag">Polygon</span>
-                        <span class="skill-tag">ERC20</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Integrations &amp; Payments</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">Stripe</span>
-                        <span class="skill-tag">Razorpay</span>
-                        <span class="skill-tag">WhatsApp API</span>
-                        <span class="skill-tag">USDT (Polygon)</span>
-                        <span class="skill-tag">JWT</span>
-                        <span class="skill-tag">OAuth 2.0</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>CMS &amp; E-Commerce</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">Shopify</span>
-                        <span class="skill-tag">WordPress</span>
-                        <span class="skill-tag">Liquid</span>
-                        <span class="skill-tag">WooCommerce</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>Developer Tools &amp; Languages</h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag">Git</span>
-                        <span class="skill-tag">JIRA</span>
-                        <span class="skill-tag">Postman</span>
-                        <span class="skill-tag">Jest</span>
-                        <span class="skill-tag">Socket.io</span>
-                        <span class="skill-tag">Bash</span>
-                        <span class="skill-tag">SQL</span>
-                        <span class="skill-tag">Python</span>
-                        <span class="skill-tag">TypeScript</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- HOBBIES WINDOW -->
-        <div class="window" id="hobbiesWindow">
-            <div class="window-header"><span>Hobbies &amp; Interests</span><div class="window-controls"><div class="window-btn close-btn">×</div></div></div>
-            <div class="window-content">
-                <h2>Life Beyond the Terminal 🎯</h2>
-                <p>When I'm not building AI pipelines or debugging production issues, you'll find me:</p>
-                <div class="hobby-grid">
-                    <div class="hobby-card">
-                        <h3>🏋️ Lifting Heavy Things</h3>
-                        <ul style="margin-left:20px;margin-top:10px;">
-                            <li>Training 5-6 days/week</li>
-                            <li>Strength &amp; Hypertrophy focused</li>
-                            <li>Compound movements &gt; everything</li>
-                            <li>Progressive overload is life</li>
-                        </ul>
-                        <p style="margin-top:10px;"><em>"Code gets refactored, muscles get rebuilt."</em></p>
-                    </div>
-                    <div class="hobby-card">
-                        <h3>🎵 Making Beats</h3>
-                        <ul style="margin-left:20px;margin-top:10px;">
-                            <li>Electronic &amp; Lo-fi producer</li>
-                            <li>FL Studio / Ableton Live</li>
-                            <li>Synthesis &amp; Sound Design nerd</li>
-                            <li>Best debugging happens with good music</li>
-                        </ul>
-                        <p style="margin-top:10px;"><em>"Creating harmony from chaos."</em></p>
-                    </div>
-                    <div class="hobby-card">
-                        <h3>📚 Forever Learning</h3>
-                        <ul style="margin-left:20px;margin-top:10px;">
-                            <li>AI agents &amp; LLM orchestration</li>
-                            <li>Web3 &amp; DeFi protocols</li>
-                            <li>Distributed systems design</li>
-                            <li>Performance engineering deep dives</li>
-                        </ul>
-                        <p style="margin-top:10px;"><em>"The day you stop learning is the day you become obsolete."</em></p>
-                    </div>
-                    <div class="hobby-card">
-                        <h3>🎮 Gaming &amp; Analysis</h3>
-                        <ul style="margin-left:20px;margin-top:10px;">
-                            <li>Strategy games &amp; RPGs</li>
-                            <li>Game development enthusiast</li>
-                            <li>Analysing player behavior</li>
-                            <li>Understanding game economics</li>
-                        </ul>
-                        <p style="margin-top:10px;"><em>"Every game is a lesson in UX."</em></p>
-                    </div>
-                </div>
-                <h3 style="margin-top:20px;">💭 My Philosophy</h3>
-                <p style="margin-top:10px;font-style:italic;padding:15px;background:var(--bg-primary);border-left:3px solid var(--accent);">
-                    "Whether debugging a stubborn bug, perfecting my deadlift, or layering synths — it's all the same mindset. Focus on fundamentals. Embrace the grind. Iterate relentlessly."
-                </p>
-            </div>
-        </div>
-
-        <!-- CONTACT WINDOW -->
-        <div class="window" id="contactWindow">
-            <div class="window-header"><span>Contact Me</span><div class="window-controls"><div class="window-btn close-btn">×</div></div></div>
-            <div class="window-content">
-                <h2>Let's Build Something Together 📧</h2>
-                <p>Got an idea? Need a developer? Want to chat about AI, blockchain, fitness, or music? I'm always down for a good conversation.</p>
-                <div class="contact-links">
-                    <a href="mailto:ayush.pahuja090@gmail.com" class="contact-link">📧 ayush.pahuja090@gmail.com</a>
-                    <a href="tel:+918503022066" class="contact-link">📱 +91 8503022066</a>
-                    <a href="https://github.com/Lowdata" target="_blank" rel="noopener noreferrer" class="contact-link">💻 GitHub: @Ayush-Pahuja</a>
-                    <a href="https://linkedin.com/in/ayush-pahuja-b4455b17b" target="_blank" rel="noopener noreferrer" class="contact-link">💼 LinkedIn: /in/ayush-pahuja-b4455b17b</a>
-                </div>
-                <h3 style="margin-top:25px;">What I Can Help You With 🚀</h3>
-                <ul style="margin-left:20px;margin-top:10px;line-height:2;">
-                    <li><strong>AI &amp; Agentic Systems</strong> — LLM orchestration, multi-agent workflows, computer vision</li>
-                    <li><strong>Full Stack Development</strong> — Web apps that scale and perform</li>
-                    <li><strong>DevOps &amp; CI/CD</strong> — Docker, GitHub Actions, zero-downtime deployments</li>
-                    <li><strong>Blockchain Integration</strong> — Web3, ERC20, smart contracts</li>
-                    <li><strong>Shopify / WordPress</strong> — Custom stores and enterprise sites</li>
-                    <li><strong>Data Analytics</strong> — Turn data into actionable insights</li>
-                    <li><strong>Technical Consulting</strong> — Architecture, optimisation, scaling</li>
-                </ul>
-                <p style="margin-top:20px;padding:15px;background:var(--bg-primary);border-left:3px solid var(--accent);">
-                    <strong>💡 Currently Available</strong><br>
-                    Open for freelance projects, contract work, and full-time opportunities. Let's turn your vision into reality!
-                </p>
-            </div>
-        </div>
+  <!-- PROJECTS -->
+  <section class="section" id="projects">
+    <div class="section-head">
+      <div>
+        <div class="section-tag">03 / projects</div>
+        <h2 class="section-title">Things I've shipped</h2>
+      </div>
+      <div class="section-note">Every link below is live — click through to the real product or the source.</div>
     </div>
 
-    <script>
-        const fileSystem = {
-            '/':['home','usr','etc','var'],'/home':['visitor','ayush'],
-            '/home/visitor':['README.txt','about.txt','projects.txt','skills.txt','contact.txt'],
-            '/home/ayush':['portfolio','code','music','gym-stats.txt'],
-            '/usr':['bin','local'],'/etc':['config'],'/var':['log']
-        };
-        const fileContents = {
-            'README.txt':"Welcome to Ayush's Portfolio Terminal!\n\nNavigate through this system to learn more about me.\nUse \"ls\" to list files, \"cat\" to read them, and \"help\" for all commands.\n\nHappy exploring!",
-            'about.txt':"Full Stack AI Engineer | DevOps | Blockchain Enthusiast\n\nB.Tech ECE — NSUT East Campus, New Delhi (2019–2023)\n\n2+ years building AI-powered products, agentic workflows & scalable systems.\nLangGraph | YOLOv8 | Claude API | Supabase | Docker | 50K+ users served",
-            'projects.txt':"Major Projects:\n\n1. Iberia Gold Token Sale Platform (ERC20, Stripe, USDT/Polygon)\n2. WhatsApp Chat Analytics Platform\n3. Customer Management System\n4. Crypto Wallet Application\n5. Catoff Protocol (Open Source)\n\nTry \"open projects\" for detailed view!",
-            'skills.txt':"Technical Skills:\n\nAI: LangChain, LangGraph, CrewAI, Claude/Gemini API, YOLOv8, OpenCV\nFrontend: React, Next.js, TypeScript, Tailwind, Shadcn\nBackend: Node.js, Supabase, Express, Python\nDatabase: PostgreSQL, MongoDB, MySQL, Redis, Firebase\nDevOps: AWS, Vercel, Docker, GitHub Actions, NGINX, Prometheus, Grafana\nWeb3: Ethereum, Polygon, ERC20, Smart Contracts\n\nType \"skills\" for complete arsenal!",
-            'contact.txt':"Email: ayush.pahuja090@gmail.com\nPhone: +91 8503022066\nGitHub: github.com/Ayush-Pahuja\nLinkedIn: linkedin.com/in/ayush-pahuja-b4455b17b",
-            'gym-stats.txt':"Training: 5-6 days/week | Strength & Hypertrophy\nFocus: Compound movements, progressive overload\nMotto: \"Code gets refactored, muscles get rebuilt.\""
-        };
-        let currentPath = '/home/visitor';
+    <div class="proj-grid">
 
-        const commands = {
-            help:`<span style="color:var(--text-secondary)">Available Commands:</span>
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      <!-- Swatch -->
+      <div class="proj featured">
+        <div>
+          <div class="proj-head">
+            <span class="status-pill live"><span class="pulse-dot"></span>live</span>
+          </div>
+          <div class="proj-title">Swatch</div>
+          <p class="proj-desc">A premium design utility for front-end developers. Tune shadows, gradients, colour palettes, and full brand themes visually — then copy the exact CSS, Tailwind, or variable output.</p>
+          <div class="proj-stack">
+            <span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Tailwind CSS</span><span class="chip">Vercel</span>
+          </div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link primary" href="https://swatch-lilac.vercel.app/" target="_blank" rel="noopener">Live demo <span class="arrow">↗</span></a>
+          <a class="proj-link" href="https://github.com/Lowdata/swatch" target="_blank" rel="noopener">View source <span class="arrow">↗</span></a>
+        </div>
+      </div>
 
-<span style="color:var(--accent)">FILE SYSTEM</span>
-  ls [dir]  pwd  cd [dir]  cat [file]  echo [text]  tree  man [cmd]
+      <!-- Nukriti+ -->
+      <div class="proj featured">
+        <div>
+          <div class="proj-head">
+            <span class="status-pill live"><span class="pulse-dot"></span>live</span>
+          </div>
+          <div class="proj-title">Nukriti+</div>
+          <p class="proj-desc">A private "Netflix for family memories" — upload and stream home videos with a proper media-library experience, built for one family's archive rather than the public internet.</p>
+          <div class="proj-stack">
+            <span class="chip">Next.js</span><span class="chip">Firebase</span><span class="chip">Cloudflare R2</span>
+          </div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link primary" href="https://nukritiplusapp.vercel.app/" target="_blank" rel="noopener">Live demo <span class="arrow">↗</span></a>
+          <a class="proj-link" href="https://github.com/Lowdata/nukritiplusapp" target="_blank" rel="noopener">View source <span class="arrow">↗</span></a>
+        </div>
+      </div>
 
-<span style="color:var(--accent)">INFORMATION</span>
-  neofetch  about  whoami  experience  projects  skills  hobbies
+      <!-- CertiFit -->
+      <div class="proj">
+        <div>
+          <div class="proj-head">
+            <span class="status-pill progress">in progress</span>
+          </div>
+          <div class="proj-title">CertiFit</div>
+          <p class="proj-desc">An AI-based recruiting platform that scores candidates against a specific job profile using Gemini AI and an internal weighted-scoring formula — built to cut early-stage screening time for recruiters.</p>
+          <div class="proj-stack">
+            <span class="chip">Next.js</span><span class="chip">FastAPI</span><span class="chip">Gemini AI</span>
+          </div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link" href="https://github.com/Lowdata/CertiFit" target="_blank" rel="noopener">View source <span class="arrow">↗</span></a>
+          <span class="proj-link disabled">Live demo — coming soon</span>
+        </div>
+      </div>
 
-<span style="color:var(--accent)">CONTACT & SOCIAL</span>
-  contact  email  github  linkedin
+      <!-- Iberia Gold -->
+      <div class="proj">
+        <div>
+          <div class="proj-head">
+            <span class="status-pill live"><span class="pulse-dot"></span>live</span>
+          </div>
+          <div class="proj-title">Iberia Gold Token Platform</div>
+          <p class="proj-desc">A secure ERC20 token sale platform supporting purchases via Stripe and USDT on Polygon, with PostgreSQL-backed transactional integrity and an automated autosweep service for treasury aggregation. Zero security breaches in production.</p>
+          <div class="proj-stack">
+            <span class="chip">React</span><span class="chip">Node.js</span><span class="chip">PostgreSQL</span><span class="chip">Stripe</span><span class="chip">Polygon</span>
+          </div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link primary" href="https://www.iberiagold.com/" target="_blank" rel="noopener">Main site <span class="arrow">↗</span></a>
+          <a class="proj-link" href="https://igst.iberia.secdex.net/Iberia" target="_blank" rel="noopener">Token platform <span class="arrow">↗</span></a>
+        </div>
+      </div>
 
-<span style="color:var(--accent)">SERVICES</span>
-  shopify  wordpress
+      <!-- The Place To Be -->
+      <div class="proj">
+        <div>
+          <div class="proj-head">
+            <span class="status-pill live"><span class="pulse-dot"></span>live</span>
+          </div>
+          <div class="proj-title">The Place To Be</div>
+          <p class="proj-desc">A booking and events site for farmhouse parties — built fast and lean, with Firebase handling data and Hostinger for hosting.</p>
+          <div class="proj-stack">
+            <span class="chip">HTML</span><span class="chip">Firebase</span><span class="chip">Hostinger</span>
+          </div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link primary" href="https://theplacetobe.social/" target="_blank" rel="noopener">Visit site <span class="arrow">↗</span></a>
+          <span class="proj-link disabled">Source — private</span>
+        </div>
+      </div>
 
-<span style="color:var(--accent)">FUN</span>
-  quote  joke  ascii  matrix  banner
+      <!-- WhatsApp Analytics -->
+      <div class="proj">
+        <div>
+          <div class="proj-head">
+            <span class="status-pill archived">archived</span>
+          </div>
+          <div class="proj-title">WhatsApp Chat Analytics</div>
+          <p class="proj-desc">Processes 1M+ messages into real-time analytics and visualisations, with query optimisation that cut database response time by 60%.</p>
+          <div class="proj-stack">
+            <span class="chip">React</span><span class="chip">Express</span><span class="chip">MongoDB</span><span class="chip">Chart.js</span>
+          </div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link" href="https://github.com/Lowdata" target="_blank" rel="noopener">View on GitHub <span class="arrow">↗</span></a>
+        </div>
+      </div>
 
-<span style="color:var(--accent)">SYSTEM</span>
-  date  uptime  clear  theme [matrix|ubuntu|retro]
-  desktop  terminal  open [section]  history  sudo  exit
+      <!-- Crypto Wallet -->
+      <div class="proj">
+        <div>
+          <div class="proj-head">
+            <span class="status-pill archived">archived</span>
+          </div>
+          <div class="proj-title">Crypto Wallet App</div>
+          <p class="proj-desc">A cross-platform mobile wallet for Ethereum and Polygon with real-time prices, push notifications, and live WebSocket pricing — reached 5K+ monthly users.</p>
+          <div class="proj-stack">
+            <span class="chip">React Native</span><span class="chip">Firebase</span><span class="chip">Web3.js</span>
+          </div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link" href="https://github.com/Lowdata" target="_blank" rel="noopener">View on GitHub <span class="arrow">↗</span></a>
+        </div>
+      </div>
 
-<span style="color:var(--accent)">TIP:</span> ↑/↓ arrow keys navigate command history
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      <!-- Catoff Protocol -->
+      <div class="proj">
+        <div>
+          <div class="proj-head">
+            <span class="status-pill archived">open source</span>
+          </div>
+          <div class="proj-title">Catoff Protocol</div>
+          <p class="proj-desc">Bridges Web2 and Web3 — connecting YouTube APIs to on-chain smart contracts with decentralised verification and analytics dashboards. 10+ merged PRs.</p>
+          <div class="proj-stack">
+            <span class="chip">Node.js</span><span class="chip">React</span><span class="chip">D3.js</span><span class="chip">Smart Contracts</span>
+          </div>
+        </div>
+        <div class="proj-links">
+          <a class="proj-link" href="https://github.com/Lowdata" target="_blank" rel="noopener">View on GitHub <span class="arrow">↗</span></a>
+        </div>
+      </div>
 
-            neofetch:`<pre style="color:var(--accent)">
-                   -\`                    visitor@ayush-portfolio
-                  .o+\`                   ━━━━━━━━━━━━━━━━━━━━━━
-                 \`ooo/                   <span style="color:var(--text-primary)">OS:</span> AyushOS v1.0
-                \`+oooo:                  <span style="color:var(--text-primary)">Host:</span> Portfolio Terminal
-               \`+oooooo:                 <span style="color:var(--text-primary)">Kernel:</span> Full Stack AI Engineer
-             \`/:-:++oooo+:               <span style="color:var(--text-primary)">Uptime:</span> 2+ years in production
-            \`/++++/+++++++:              <span style="color:var(--text-primary)">Packages:</span> LangGraph, YOLOv8, React, Supabase, Docker
-           \`/++++++++++++++:             <span style="color:var(--text-primary)">Shell:</span> bash + zsh + coffee
-          \`/+++ooooooooooooo/\`           <span style="color:var(--text-primary)">Resolution:</span> 99.9% uptime
-         ./ooosssso++osssssso+\`          <span style="color:var(--text-primary)">Theme:</span> Matrix [Ubuntu] [Retro]
-        .oossssso-\`\`\`\`/ossssss+\`         <span style="color:var(--text-primary)">Terminal:</span> AyushShell
-       -osssssso.      :ssssssso.        <span style="color:var(--text-primary)">CPU:</span> Caffeinated AI Engineer
-      :osssssss/        osssso+++.       <span style="color:var(--text-primary)">GPU:</span> YOLOv8 + OpenCV Unit
-     /ossssssss/        +ssssooo/-       <span style="color:var(--text-primary)">Memory:</span> Unlimited (w/ Stack Overflow)
-   \`/ossssso+/:-        -:/+osssso+-     <span style="color:var(--text-primary)">Deploy:</span> AWS + Vercel (15 min cycles)
-  \`+sso+:-\`                 \`.-/+oso:    <span style="color:var(--text-primary)">Monitor:</span> Prometheus + Grafana
- \`++:.                           \`-/+/   <span style="color:var(--text-primary)">Disk:</span> GitHub repos & gists
- .\`                                 \`/   <span style="color:var(--text-primary)">Status:</span> ✓ Online & Available
-</pre>`,
+    </div>
+  </section>
 
-            about:`<span style="color:var(--accent);font-weight:bold;">Hey there! I'm Ayush 👋</span>
+  <!-- SKILLS -->
+  <section class="section" id="skills">
+    <div class="section-head">
+      <div>
+        <div class="section-tag">04 / skills</div>
+        <h2 class="section-title">The toolkit</h2>
+      </div>
+      <div class="section-note">If it involves AI, the web, or blockchain — it's in here somewhere.</div>
+    </div>
 
-Full Stack AI Engineer with 2+ years building production-ready systems at the
-intersection of intelligent automation, scalable architecture, and blockchain.
+    <div class="skill-grid">
+      <div class="skill-block">
+        <h3>AI &amp; Orchestration</h3>
+        <div class="skill-tags"><span>LangChain</span><span>LangGraph</span><span>CrewAI</span><span>Claude API</span><span>Gemini API</span><span>YOLOv8</span><span>OpenCV</span><span>Agentic Workflows</span></div>
+      </div>
+      <div class="skill-block">
+        <h3>Frontend</h3>
+        <div class="skill-tags"><span>React</span><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>Shadcn/UI</span><span>Vue.js</span></div>
+      </div>
+      <div class="skill-block">
+        <h3>Backend</h3>
+        <div class="skill-tags"><span>Node.js</span><span>Express</span><span>FastAPI</span><span>Supabase Edge Functions</span><span>Python</span><span>REST &amp; GraphQL</span><span>WebSockets</span></div>
+      </div>
+      <div class="skill-block">
+        <h3>Database</h3>
+        <div class="skill-tags"><span>PostgreSQL</span><span>Supabase</span><span>MongoDB</span><span>MySQL</span><span>Redis</span><span>Firebase</span></div>
+      </div>
+      <div class="skill-block">
+        <h3>Cloud &amp; DevOps</h3>
+        <div class="skill-tags"><span>AWS (EC2, S3, Lambda)</span><span>Vercel</span><span>Docker</span><span>Kubernetes</span><span>GitHub Actions</span><span>Prometheus</span><span>Grafana</span></div>
+      </div>
+      <div class="skill-block">
+        <h3>Web3 &amp; Payments</h3>
+        <div class="skill-tags"><span>Web3.js</span><span>Ethers.js</span><span>Ethereum</span><span>Polygon</span><span>ERC20</span><span>Stripe</span><span>Razorpay</span></div>
+      </div>
+    </div>
+  </section>
 
-<span style="color:var(--text-secondary)">🎓 Education</span>
-B.Tech ECE — NSUT East Campus, New Delhi (2019–2023)
+  <!-- HOBBIES -->
+  <section class="section" id="hobbies">
+    <div class="section-head">
+      <div>
+        <div class="section-tag">05 / outside work</div>
+        <h2 class="section-title">Off the clock</h2>
+      </div>
+    </div>
+    <div class="hobby-row">
+      <div class="hobby"><span class="hi">🏋️</span><h4>Lifting</h4><p>5–6 days a week. Strength and hypertrophy, compound movements first.</p></div>
+      <div class="hobby"><span class="hi">🎵</span><h4>Producing</h4><p>Electronic and lo-fi beats in FL Studio and Ableton. Best debugging happens with good music on.</p></div>
+      <div class="hobby"><span class="hi">📚</span><h4>Reading</h4><p>Distributed systems, agentic AI design, and Web3 protocols for fun.</p></div>
+      <div class="hobby"><span class="hi">🎮</span><h4>Gaming</h4><p>Strategy games and RPGs — mostly for the game economics and UX design.</p></div>
+    </div>
+  </section>
 
-<span style="color:var(--text-secondary)">🤖 AI & Agentic Systems</span>
-• LangGraph multi-agent orchestration with Claude & Gemini APIs
-• YOLOv8 training & fine-tuning for custom object detection
-• OpenCV for advanced image processing & computer vision pipelines
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="contact-wrap">
+      <div class="contact-title">Got something worth <em>building</em>?</div>
+      <p class="contact-sub">I'm currently open for freelance projects, contract work, and full-time roles. Reach out and let's talk.</p>
+      <div class="contact-rows">
+        <a class="contact-row" href="mailto:ayush.pahuja090@gmail.com">
+          <span><span class="ck">email</span><br><span class="cv">ayush.pahuja090@gmail.com</span></span>
+          <span class="arrow">↗</span>
+        </a>
+        <a class="contact-row" href="tel:+918503022066">
+          <span><span class="ck">phone</span><br><span class="cv">+91 85030 22066</span></span>
+          <span class="arrow">↗</span>
+        </a>
+        <a class="contact-row" href="https://github.com/Lowdata" target="_blank" rel="noopener">
+          <span><span class="ck">github</span><br><span class="cv">github.com/Lowdata</span></span>
+          <span class="arrow">↗</span>
+        </a>
+        <a class="contact-row" href="https://linkedin.com/in/ayush-pahuja-b4455b17b" target="_blank" rel="noopener">
+          <span><span class="ck">linkedin</span><br><span class="cv">/in/ayush-pahuja-b4455b17b</span></span>
+          <span class="arrow">↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
 
-<span style="color:var(--text-secondary)">💻 Full Stack & DevOps</span>
-• Systems supporting 50K+ users — Prometheus & Grafana monitoring
-• Deployment cycles cut from 2h → 15 min with Docker + GitHub Actions
-• Zero security breaches across all production AI & blockchain platforms
+  <footer>AyushOS — rebuilt, not rebooted. © 2026 Ayush Pahuja.</footer>
 
-<span style="color:var(--accent)">Type 'experience' | 'projects' | 'skills' to explore more</span>`,
-
-            whoami:`<span style="color:var(--accent)">Ayush Pahuja</span>
-Full Stack AI Engineer | DevOps | Blockchain | Gym Rat | Beat Maker
-
-Location: Delhi, India 🇮🇳  |  Status: Available for projects ✓
-Superpower: Turning LLMs and APIs into production-grade intelligent systems
-Weakness: Can't resist optimising code (even when it's "good enough")
-
-<span style="color:var(--text-secondary)">Fun fact:</span> I build AI agents by day, lift heavy things at night, and make beats in between.`,
-
-            experience:`<span style="color:var(--accent);font-weight:bold;">Professional Journey 💼</span>
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-<span style="color:var(--text-secondary)">[1] Vegavid Technologies — Full Stack & AI Engineer</span>
-    Jun 2024 – Sep 2025 | Remote
-
-    Building production AI tools and scalable DevOps infrastructure:
-    • Integrated Claude & Gemini APIs; LangGraph multi-agent orchestration
-    • Trained & fine-tuned YOLOv8 for custom object detection (OpenCV)
-    • Iberia Gold Token Sale Platform — ERC20 via Stripe + USDT (Polygon)
-    • Autosweep Node.js cron for treasury fund aggregation
-    • Migrated to Supabase (Edge Functions, Auth) + Tailwind CSS
-    • Docker + GitHub Actions → zero-downtime deployments on Vercel & EC2
-    • 50K+ users monitored with Prometheus & Grafana
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-<span style="color:var(--text-secondary)">[2] OneRare — Full Stack Developer</span>
-    Jan 2023 – Jun 2024 | Remote
-
-    Web3 dApp development at production scale:
-    • dApps with React.js, Web3.js, smart contracts on Ethereum & Polygon
-    • Backend APIs on AWS EC2 + CloudWatch — 99.9% uptime during NFT sales
-    • Docker Compose + GitHub Actions for staging-to-production cycles
-    • JWT & OAuth 2.0 authentication systems
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-<span style="color:var(--accent)">Type 'projects' to see what I've shipped!</span>`,
-
-            projects:`<span style="color:var(--accent);font-weight:bold;">Things I've Built 🚀</span>
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-<span style="color:var(--text-secondary)">[1] Iberia Gold Token Sale Platform</span>
-    React • Node.js • PostgreSQL • Stripe • Web3.js • Polygon
-    ERC20 purchases via Stripe & USDT. Autosweep cron. Zero breaches.
-
-<span style="color:var(--text-secondary)">[2] WhatsApp Chat Analytics Platform</span>
-    React • Node.js • Express • MongoDB • Chart.js
-    1M+ messages. Real-time analytics. 60% faster DB queries.
-
-<span style="color:var(--text-secondary)">[3] Customer Management System</span>
-    React • Node.js • MongoDB • JWT • Stripe API
-    500+ customers, 2K+ transactions, role-based access, auto-invoicing.
-
-<span style="color:var(--text-secondary)">[4] Crypto Wallet Application</span>
-    React Native • Node.js • Firebase • Web3.js
-    Ethereum + Polygon. Real-time prices. 5K+ monthly users.
-
-<span style="color:var(--text-secondary)">[5] Catoff Protocol (Open Source)</span>
-    Node.js • React • D3.js • Smart Contracts
-    YouTube API + blockchain verification. 10+ merged PRs.
-
-<span style="color:var(--accent)">🔗 github.com/Ayush-Pahuja</span>`,
-
-            skills:`<span style="color:var(--accent);font-weight:bold;">My Technical Arsenal ⚡</span>
-
-<span style="color:var(--text-secondary)">AI & Agents:</span>  LangChain, LangGraph, CrewAI, Claude API, Gemini API
-             YOLOv8, OpenCV, LLM Prompt Engineering, Agentic Workflows
-
-<span style="color:var(--text-secondary)">Frontend:</span>    React, Next.js, TypeScript, Tailwind CSS, Shadcn/UI, Vue.js
-
-<span style="color:var(--text-secondary)">Backend:</span>     Node.js, Supabase (Edge Fn), Express, Python, REST, WebSockets
-
-<span style="color:var(--text-secondary)">Database:</span>    PostgreSQL, Supabase, MongoDB, MySQL, Redis, Firebase, DynamoDB
-
-<span style="color:var(--text-secondary)">DevOps:</span>      AWS (EC2, S3, RDS, Lambda), Vercel, Docker, Kubernetes
-             GitHub Actions CI/CD, NGINX, Prometheus, Grafana
-
-<span style="color:var(--text-secondary)">Web3:</span>        Web3.js, Ethers.js, Smart Contracts, Ethereum, Polygon, ERC20
-
-<span style="color:var(--text-secondary)">Payments:</span>    Stripe, Razorpay, WhatsApp API, USDT (Polygon)
-
-<span style="color:var(--text-secondary)">CMS:</span>         Shopify (Liquid), WordPress, WooCommerce
-
-<span style="color:var(--text-secondary)">Languages:</span>   JavaScript (ES6+), TypeScript, Python, Bash, SQL, Java
-
-<span style="color:var(--accent)">If it involves AI, web, or blockchain — I've got you covered.</span>`,
-
-            hobbies:`<span style="color:var(--accent);font-weight:bold;">Life Beyond the Terminal 🎯</span>
-
-<span style="color:var(--text-secondary)">🏋️ Lifting Heavy Things</span>   5-6 days/week | Strength & Hypertrophy
-<span style="color:var(--text-secondary)">🎵 Making Beats</span>           Electronic & Lo-fi | FL Studio / Ableton
-<span style="color:var(--text-secondary)">📚 Forever Learning</span>       AI agents, Web3, distributed systems, perf eng
-<span style="color:var(--text-secondary)">🎮 Gaming & Analysis</span>      Strategy + RPGs | Player behavior | Game economics
-
-<span style="color:var(--accent)">Mindset:</span> Focus on fundamentals. Embrace the grind. Iterate relentlessly.`,
-
-            contact:`<span style="color:var(--accent);font-weight:bold;">Let's Build Something Together 📧</span>
-Email:    <a href="mailto:ayush.pahuja090@gmail.com" style="color:var(--accent)">ayush.pahuja090@gmail.com</a>
-Phone:    <a href="tel:+918503022066" style="color:var(--accent)">+91 8503022066</a>
-GitHub:   <a href="https://github.com/Lowdata" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">github.com/Ayush-Pahuja</a>
-LinkedIn: <a href="https://linkedin.com/in/ayush-pahuja-b4455b17b" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">linkedin.com/in/ayush-pahuja-b4455b17b</a>`,
-
-            email:`Opening mail client...\n<a href="mailto:ayush.pahuja090@gmail.com" style="color:var(--accent)">ayush.pahuja090@gmail.com</a>`,
-            github:`GitHub: <a href="https://github.com/Lowdata" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">github.com/Ayush-Pahuja</a>`,
-            linkedin:`LinkedIn: <a href="https://linkedin.com/in/ayush-pahuja-b4455b17b" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">linkedin.com/in/ayush-pahuja-b4455b17b</a>`,
-            shopify:`<span style="color:var(--accent);font-weight:bold;">Shopify Development Services</span>
-• Custom themes & storefronts focused on conversion
-• App integrations, checkout optimisation, performance tuning
-• Headless Shopify with Next.js when needed`,
-            wordpress:`<span style="color:var(--accent);font-weight:bold;">WordPress Solutions</span>
-• Custom plugins & theme development
-• WooCommerce stores optimised for speed & security
-• SEO, caching, CDN & Core Web Vitals improvements`,
-            ascii:`<pre class="ascii-art">
-  _   _           _           _     
- | | | | __ _  __| | ___  ___| |__  
- | |_| |/ _\` |/ _\` |/ _ \/ __| '_ \ 
- |  _  | (_| | (_| |  __/\__ \ | | |
- |_| |_|\__,_|\__,_|\___||___/_| |_|
-</pre>`,
-            quote:()=>{const q=["Simplicity is the soul of efficiency. — Austin Freeman","First, solve the problem. Then, write the code. — John Johnson","Programs must be written for people to read. — Harold Abelson","Code is like humor. When you have to explain it, it's bad. — Cory House","Make it work, make it right, make it fast. — Kent Beck"];return q[Math.floor(Math.random()*q.length)];},
-            joke:()=>{const j=["Why do programmers prefer dark mode? Because light attracts bugs.","I would tell you a UDP joke, but you might not get it.","There are only 10 kinds of people: those who understand binary and those who don't.","A SQL query walks into a bar and asks two tables: 'Can I join you?'","To understand recursion, you must first understand recursion."];return j[Math.floor(Math.random()*j.length)];},
-            banner:`<pre class="ascii-art">
-    ___                       __       ____        __          _     
-   /   | __  ____  ________ / /_     / __ \____ _/ /_  __  __(_)___ 
-  / /| |/ / / / / / / ___// __ \   / /_/ / __ \`/ __ \/ / / / / __ \\
- / ___ / /_/ / /_/ (__  )/ / / /  / ____/ /_/ / / / / /_/ / / /_/ /
-/_/  |_\\__, /\\__,_/____//_/ /_/  /_/    \\__,_/_/ /_/\\__,_/_/\\__/\\__/
-      /____/                                                          
-</pre>
-<div>AyushOS — Portfolio Terminal v1.0</div>
-<div>Full Stack AI Engineer | DevOps | Blockchain Enthusiast</div>
-<div>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
-<div>Type <span class="command">'help'</span> to see available commands</div>`
-        };
-
-        const state = { history:[], historyIndex:-1, theme:localStorage.getItem('ayushos-theme')||'matrix', mode:'terminal', zTop:200, matrixRunning:false };
-
-        const terminalMode=document.getElementById('terminalMode'), desktopMode=document.getElementById('desktopMode'),
-              terminalOutput=document.getElementById('terminalOutput'), terminalInput=document.getElementById('terminalInput'),
-              terminalInputContainer=document.getElementById('terminalInputContainer'), tabs=document.querySelectorAll('.tab'),
-              themeSelector=document.getElementById('themeSelector'), clock=document.getElementById('clock'),
-              matrixCanvas=document.getElementById('matrixOverlay'), ctx=matrixCanvas.getContext('2d');
-
-        function setTheme(t){ document.body.classList.remove('theme-ubuntu','theme-matrix','theme-retro'); document.body.classList.add('theme-'+t); themeSelector.value=t; localStorage.setItem('ayushos-theme',t); }
-        setTheme(state.theme);
-        function updateClock(){ clock.textContent=new Date().toLocaleString(); }
-        updateClock(); setInterval(updateClock,1000);
-
-        function setMode(mode){
-            state.mode=mode;
-            tabs.forEach(t=>t.classList.toggle('active',t.dataset.mode===mode));
-            const isT=mode==='terminal';
-            terminalMode.classList.toggle('active',isT); terminalInputContainer.classList.toggle('active',isT); desktopMode.classList.toggle('active',!isT);
-            if(isT) focusInput();
-            if(mode==='desktop'){ resizeMatrix(); state.matrixRunning?startMatrix():stopMatrix(); } else stopMatrix();
-        }
-        tabs.forEach(t=>t.addEventListener('click',()=>setMode(t.dataset.mode)));
-        themeSelector.addEventListener('change',e=>{ state.theme=e.target.value; setTheme(e.target.value); });
-
-        function focusInput(){ setTimeout(()=>terminalInput.focus(),0); }
-        function scrollToBottom(){ terminalMode.scrollTop=terminalMode.scrollHeight; }
-        function printLine(html=''){ const d=document.createElement('div'); d.className='terminal-line'; d.innerHTML=html; terminalOutput.appendChild(d); scrollToBottom(); }
-        function printPromptWithCommand(cmd){ const dp=currentPath==='/home/visitor'?'~':currentPath; printLine(`<span class="prompt">visitor@ayush-portfolio:${dp}$</span> <span class="command">${escapeHtml(cmd)}</span>`); }
-        function updatePrompt(){ const s=document.querySelector('.terminal-input-line .prompt'); if(s){ const dp=currentPath==='/home/visitor'?'~':currentPath; s.textContent=`visitor@ayush-portfolio:${dp}$`; } }
-        function clearTerminal(){ terminalOutput.innerHTML=''; }
-        function escapeHtml(s){ if(typeof s!=='string')return''; return s.replace(/[&<>"'`=/]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;','`':'&#x60;','=':'&#x3D;','/':'&#x2F;'}[m])); }
-        function sanitizeForDisplay(s){ if(typeof s!=='string')return''; return escapeHtml(s.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,'')); }
-        function normalizePath(p){ p=p.replace(/\0/g,'').replace(/\/+/g,'/'); if(p==='~')return'/home/visitor'; if(p.startsWith('~/'))return'/home/visitor/'+p.slice(2); if(!p.startsWith('/'))return currentPath==='/'?'/'+p:currentPath+'/'+p; return p; }
-        function getDirectoryContents(p){ return fileSystem[p]||null; }
-        function isDirectory(p){ return fileSystem.hasOwnProperty(p); }
-        function isFile(f,d){ const c=getDirectoryContents(d); return c&&c.includes(f); }
-        function getFileContent(f){ return fileContents[f]||null; }
-
-        function handleCommand(inputRaw){
-            const input=inputRaw.trim(); if(!input){ printLine(); return; }
-            state.history.push(input); state.historyIndex=state.history.length;
-            printPromptWithCommand(input);
-            const [cmd,...args]=input.split(/\s+/), argStr=args.join(' ').trim(), argStrLower=argStr.toLowerCase();
-            switch(cmd.toLowerCase()){
-                case 'ls':{ const lp=argStr?normalizePath(argStr):currentPath, lc=getDirectoryContents(lp);
-                    if(lc){ const dirs=lc.filter(i=>isDirectory(lp==='/'?'/'+i:lp+'/'+i)), files=lc.filter(i=>!isDirectory(lp==='/'?'/'+i:lp+'/'+i));
-                        let out=''; dirs.forEach(d=>out+=`<span style="color:var(--accent);font-weight:bold;">${d}/</span>  `); files.forEach(f=>out+=`<span style="color:var(--text-primary)">${f}</span>  `);
-                        printLine(out||'<span style="color:var(--text-secondary)">(empty)</span>'); }
-                    else printLine(`<span class="error">ls: cannot access '${escapeHtml(argStr)}': No such directory</span>`); break; }
-                case 'pwd': printLine(currentPath); break;
-                case 'cd':
-                    if(!argStr||argStr==='~'){ currentPath='/home/visitor'; updatePrompt(); }
-                    else if(argStr==='..'){ if(currentPath!=='/'){ const p=currentPath.split('/').filter(x=>x); p.pop(); currentPath=p.length===0?'/':'/'+p.join('/'); updatePrompt(); } }
-                    else if(argStr==='/'){ currentPath='/'; updatePrompt(); }
-                    else{ const np=normalizePath(argStr); if(isDirectory(np)){ currentPath=np; updatePrompt(); } else printLine(`<span class="error">cd: ${escapeHtml(argStr)}: No such directory</span>`); }
-                    break;
-                case 'cat':
-                    if(!argStr) printLine(`<span class="error">cat: missing file operand</span>`);
-                    else if(isFile(argStr,currentPath)){ const c=getFileContent(argStr); c?printLine(c.replace(/\n/g,'<br>')):printLine(`<span class="error">cat: cannot read file</span>`); }
-                    else printLine(`<span class="error">cat: ${escapeHtml(argStr)}: No such file</span>`);
-                    break;
-                case 'tree':
-                    ['\u003cspan style="color:var(--accent)"\u003eDirectory Tree:\u003c/span\u003e','/','├── home/','│   ├── visitor/','│   │   ├── README.txt','│   │   ├── about.txt','│   │   ├── projects.txt','│   │   ├── skills.txt','│   │   └── contact.txt','│   └── ayush/','│       ├── portfolio/','│       ├── code/','│       ├── music/','│       └── gym-stats.txt','├── usr/','│   ├── bin/','│   └── local/','├── etc/','│   └── config/','└── var/','    └── log/'].forEach(l=>printLine(l));
-                    break;
-                case 'echo': printLine(sanitizeForDisplay(argStr||'')); break;
-                case 'man':{ const mp={ls:'LS(1) — list directory contents\nUsage: ls [directory]',cd:'CD(1) — change directory\nUsage: cd [directory|..|~|/]',cat:'CAT(1) — display file contents\nUsage: cat [file]',pwd:'PWD(1) — print working directory',help:'HELP(1) — display available commands',tree:'TREE(1) — display directory tree',echo:'ECHO(1) — display text\nUsage: echo [text]'};
-                    if(!argStrLower) printLine('Usage: man [command]');
-                    else if(mp[argStrLower]) printLine(mp[argStrLower].replace(/\n/g,'<br>'));
-                    else printLine(`<span class="error">No manual entry for ${escapeHtml(argStrLower)}</span>`); break; }
-                case 'help': printLine(commands.help); break;
-                case 'banner': printLine(commands.banner); break;
-                case 'neofetch': printLine(commands.neofetch); break;
-                case 'about': case 'whoami': case 'experience': case 'projects':
-                case 'skills': case 'hobbies': case 'contact': case 'email':
-                case 'github': case 'linkedin': case 'shopify': case 'wordpress': case 'ascii':
-                    printLine(typeof commands[cmd]==='function'?commands[cmd]():commands[cmd]); break;
-                case 'quote': case 'joke': printLine(commands[cmd]()); break;
-                case 'date': printLine(new Date().toString()); break;
-                case 'uptime': printLine(`Uptime: ${Math.floor(Math.random()*300)+700} days | 99.9% reliability | 0 crashes`); break;
-                case 'clear': case 'cls': clearTerminal(); break;
-                case 'history': state.history.length===0?printLine('(empty)'):state.history.forEach((h,i)=>printLine(`${i+1}  ${escapeHtml(h)}`)); break;
-                case 'theme':
-                    if(!argStrLower) printLine(`Current: <span class="command">${state.theme}</span>. Usage: theme [matrix|ubuntu|retro]`);
-                    else if(['matrix','ubuntu','retro'].includes(argStrLower)){ state.theme=argStrLower; setTheme(argStrLower); printLine(`Theme → <span class="command">${argStrLower}</span>`); }
-                    else printLine(`<span class="error">Unknown theme '${escapeHtml(argStrLower)}'</span>`);
-                    break;
-                case 'desktop': setMode('desktop'); printLine('Switched to desktop mode.'); break;
-                case 'terminal': setMode('terminal'); break;
-                case 'open':{ if(!argStrLower){ printLine('Usage: open [about|experience|projects|skills|hobbies|contact]'); break; }
-                    const map={about:'aboutWindow',experience:'experienceWindow',projects:'projectsWindow',skills:'skillsWindow',hobbies:'hobbiesWindow',contact:'contactWindow'};
-                    const wid=map[argStrLower]; if(wid){ setMode('desktop'); openWindowById(wid,true); printLine(`Opened <span class="command">${argStrLower}</span>.`); }
-                    else printLine(`<span class="error">Unknown window '${escapeHtml(argStrLower)}'</span>`); break; }
-                case 'matrix': toggleMatrixOverlay(); printLine(`Matrix ${state.matrixRunning?'enabled':'disabled'}.`); break;
-                case 'sudo': printLine(`<span class="error">Permission denied:</span> Nice try 😉`); break;
-                case 'exit': printLine(`<span class="success">Goodbye! Refreshing...</span>`); setTimeout(()=>location.reload(),1500); break;
-                default: printLine(`<span class="error">Command not found:</span> ${escapeHtml(cmd)}. Type <span class="command">help</span>.`); break;
-            }
-        }
-
-        terminalInput.addEventListener('keydown',e=>{
-            if(e.key==='Enter'){ handleCommand(terminalInput.value); terminalInput.value=''; e.preventDefault(); return; }
-            if(e.key==='ArrowUp'){ if(state.historyIndex>0){ state.historyIndex--; terminalInput.value=state.history[state.historyIndex]||''; setTimeout(()=>terminalInput.setSelectionRange(terminalInput.value.length,terminalInput.value.length),0); } e.preventDefault(); }
-            else if(e.key==='ArrowDown'){ if(state.historyIndex<state.history.length){ state.historyIndex++; terminalInput.value=state.history[state.historyIndex]||''; setTimeout(()=>terminalInput.setSelectionRange(terminalInput.value.length,terminalInput.value.length),0); } e.preventDefault(); }
-            else if(e.key==='PageDown'){ terminalMode.scrollTop=terminalMode.scrollHeight; e.preventDefault(); }
-            else if(e.ctrlKey&&(e.key==='l'||e.key==='L')){ clearTerminal(); e.preventDefault(); }
-        });
-        document.addEventListener('keydown',()=>{ if(state.mode==='terminal') focusInput(); });
-        terminalMode.addEventListener('click',focusInput);
-        terminalInputContainer.addEventListener('click',focusInput);
-        document.addEventListener('mousedown',e=>{ if(state.mode==='terminal'&&!terminalInput.contains(e.target)) focusInput(); });
-
-        document.querySelectorAll('.icon').forEach(icon=>icon.addEventListener('click',()=>openWindowById(icon.getAttribute('data-window')+'Window',true)));
-
-        function openWindowById(id,center=false){
-            const win=document.getElementById(id); if(!win)return;
-            win.classList.remove('closing'); win.classList.add('active'); bringToFront(win);
-            if(center){ const {width}=desktopMode.getBoundingClientRect(); win.style.left='50%'; win.style.top='50%'; win.style.transform='translate(-50%,-50%)'; win.style.width=`${Math.min(700,width*0.85)}px`; }
-            enableDrag(win);
-            const cb=win.querySelector('.close-btn'); if(cb&&!cb._bound){ cb.addEventListener('click',()=>closeWindow(win)); cb._bound=true; }
-            if(!win._clickBound){ win.addEventListener('mousedown',()=>bringToFront(win)); win._clickBound=true; }
-        }
-        function closeWindow(win){ win.classList.add('closing'); win.addEventListener('animationend',function h(){ win.classList.remove('active','closing'); win.removeEventListener('animationend',h); }); }
-        function bringToFront(win){ state.zTop+=1; win.style.zIndex=state.zTop; }
-        function enableDrag(win){
-            const header=win.querySelector('.window-header'); if(!header||header._dragBound)return;
-            let ox=0,oy=0,drag=false;
-            header.addEventListener('mousedown',e=>{ drag=true; bringToFront(win); const r=win.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; document.addEventListener('mousemove',onM); document.addEventListener('mouseup',onU); });
-            const onM=e=>{ if(!drag)return; const dr=desktopMode.getBoundingClientRect(); win.style.left=`${Math.max(0,Math.min(e.clientX-ox-dr.left,dr.width-100))}px`; win.style.top=`${Math.max(0,Math.min(e.clientY-oy-dr.top,dr.height-40))}px`; win.style.transform='none'; };
-            const onU=()=>{ drag=false; document.removeEventListener('mousemove',onM); document.removeEventListener('mouseup',onU); };
-            header._dragBound=true;
-        }
-
-        let matrixAnimId=null;
-        function resizeMatrix(){ matrixCanvas.width=desktopMode.clientWidth; matrixCanvas.height=desktopMode.clientHeight; }
-        window.addEventListener('resize',resizeMatrix); resizeMatrix();
-        function startMatrix(){
-            if(matrixAnimId)return; matrixCanvas.classList.add('active');
-            const letters='アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', fs=14, drops=Array(Math.floor(matrixCanvas.width/fs)).fill(1);
-            function draw(){ ctx.fillStyle='rgba(0,0,0,0.05)'; ctx.fillRect(0,0,matrixCanvas.width,matrixCanvas.height); ctx.fillStyle='#0f0'; ctx.font=`${fs}px monospace`; for(let i=0;i<drops.length;i++){ ctx.fillText(letters[Math.floor(Math.random()*letters.length)],i*fs,drops[i]*fs); if(drops[i]*fs>matrixCanvas.height&&Math.random()>0.975)drops[i]=0; drops[i]++; } matrixAnimId=requestAnimationFrame(draw); } draw();
-        }
-        function stopMatrix(){ if(matrixAnimId){ cancelAnimationFrame(matrixAnimId); matrixAnimId=null; } ctx.clearRect(0,0,matrixCanvas.width,matrixCanvas.height); matrixCanvas.classList.remove('active'); }
-        function toggleMatrixOverlay(){ state.matrixRunning=!state.matrixRunning; if(state.mode==='desktop'){ state.matrixRunning?startMatrix():stopMatrix(); } else{ printLine(`<span class="command">Wake up, Neo...</span>`); setTimeout(()=>printLine(`<span class="command">The Matrix has you.</span>`),700); } }
-
-        // Boot
-        focusInput();
-        printLine(`<span class="success">✓ System Ready</span>`);
-        printLine(``);
-        printLine(`<span class="warning">Quick Start:</span>`);
-        printLine(`  • Type <span class="command">help</span> for all commands`);
-        printLine(`  • Try <span class="command">about</span> or <span class="command">neofetch</span> to learn about me`);
-        printLine(`  • Try <span class="command">experience</span> or <span class="command">skills</span> to see my stack`);
-        printLine(`  • Switch to <span class="command">desktop</span> for GUI mode`);
-        printLine(``);
-    </script>
+</main>
 </body>
 </html>
